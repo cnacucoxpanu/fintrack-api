@@ -2,16 +2,16 @@ package com.fintrack.api.service;
 
 import com.fintrack.api.dto.CategoryDto;
 import com.fintrack.api.entity.Category;
+import com.fintrack.api.exception.ResourceNotFoundException;
 import com.fintrack.api.mapper.CategoryMapper;
 import com.fintrack.api.repository.CategoryRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Service for managing categories.
+ * Contains business logic.
  */
 @Service
 @RequiredArgsConstructor
@@ -58,23 +58,23 @@ public class CategoryService {
      *
      * @param id the category ID
      * @return the found category
+     * @throws ResourceNotFoundException if category is not found
      */
     public CategoryDto getById(Long id) {
         return repository.findById(id)
                 .map(mapper::toDto)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Category not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
     }
 
     /**
      * Deletes a category by its ID.
      *
      * @param id the category ID
+     * @throws ResourceNotFoundException if category is not found
      */
     public void delete(Long id) {
         if (!repository.existsById(id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Category not found with id: " + id);
+            throw new ResourceNotFoundException("Category not found with id: " + id);
         }
         repository.deleteById(id);
     }
