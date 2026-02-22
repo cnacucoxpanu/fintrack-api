@@ -2,39 +2,43 @@ package com.fintrack.api.controller;
 
 import com.fintrack.api.dto.CategoryDto;
 import com.fintrack.api.service.CategoryService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST controller for category recources
+ * REST controller for category resources.
  */
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/categories")
+@RequiredArgsConstructor
 public class CategoryController {
 
     private final CategoryService service;
 
     /**
-     * creates a new category
+     * Gets all categories, optionally filtered by name.
+     * Demonstrates usage of @RequestParam.
      *
-     * @param dto the category data
-     * @return the created category
+     * @param name the name filter (optional)
+     * @return list of categories
      */
-    @PostMapping
-    public CategoryDto create(@RequestBody CategoryDto dto) {
-        return service.create(dto);
+    @GetMapping
+    public List<CategoryDto> getAll(@RequestParam(required = false) String name) {
+        return service.getAll(name);
     }
 
     /**
-     * gets a category by its ID
+     * Gets a category by its ID.
+     * Demonstrates usage of @PathVariable.
      *
      * @param id the category ID
      * @return the found category
@@ -45,13 +49,23 @@ public class CategoryController {
     }
 
     /**
-     * gets all categories, optionally filtered by name
+     * Creates a new category.
      *
-     * @param name the name filter (optional)
-     * @return list of categories
+     * @param dto the category data
+     * @return the created category
      */
-    @GetMapping
-    public List<CategoryDto> getAll(@RequestParam(required = false) String name) {
-        return service.getAll(name);
+    @PostMapping
+    public CategoryDto create(@Valid @RequestBody CategoryDto dto) {
+        return service.create(dto);
+    }
+
+    /**
+     * Deletes a category.
+     *
+     * @param id the category ID
+     */
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable Long id) {
+        service.delete(id);
     }
 }

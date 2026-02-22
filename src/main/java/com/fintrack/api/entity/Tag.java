@@ -1,20 +1,20 @@
-package com.fintrack.api.model;
+package com.fintrack.api.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.ManyToMany;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "categories")
 @Getter
 @Setter
-@ToString
-public class Category {
+public class Tag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,5 +22,6 @@ public class Category {
 
     private String name;
 
-    private String type;
+    @ManyToMany(mappedBy = "tags")
+    private List<Transaction> transactions = new ArrayList<>();
 }
