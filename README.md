@@ -12,8 +12,7 @@ FinTrack is a RESTful API application built with Spring Boot for tracking financ
 ## 🛠 Tech Stack
 
 *   **Java 17**
-*   **Spring Boot 3.x** (Web, Data JPA, Validation)
-*   **H2 Database** (In-memory database for testing)
+*   **Spring Boot 3.x** (Web, Data JPA, Validation
 *   **Lombok** (Boilerplate reduction)
 *   **Gradle** (Build tool)
 
