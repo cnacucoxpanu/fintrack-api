@@ -70,38 +70,6 @@ public class UserService {
         return repository.save(existing);
     }
 
-    /**
-     * Saves a user and two related accounts without a transaction.
-     *
-     * <p>Because there is no {@code @Transactional}, if an exception is thrown
-     * after some of the entities have been saved, the earlier inserts stay in
-     * the database (partial save).
-     */
-    public void createUserWithAccountsNonTransactional() {
-        User user = new User();
-        user.setName("NonTransactional demo user");
-        User savedUser = repository.save(user);
-
-        Account account1 = new Account();
-        account1.setName("Demo account 1");
-        account1.setBalance(100.0);
-        account1.setUser(savedUser);
-        accountRepository.save(account1);
-
-
-        Account account2 = new Account();
-        account2.setName("Demo account 2");
-        account2.setBalance(200.0);
-        account2.setUser(savedUser);
-        accountRepository.save(account2);
-    }
-
-    /**
-     * Saves a user and two related accounts in a single transaction.
-     *
-     * <p>If any step fails, the whole operation is rolled back and no entities
-     * are persisted (all-or-nothing behavior).
-     */
     @Transactional
     public void createUserWithAccountsTransactional() {
         User user = new User();
