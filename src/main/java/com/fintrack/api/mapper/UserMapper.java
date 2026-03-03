@@ -11,6 +11,8 @@ public class UserMapper {
         UserDto dto = new UserDto();
         dto.setId(user.getId());
         dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setDefaultCurrencyCode(user.getDefaultCurrencyCode());
         return dto;
     }
 
@@ -18,6 +20,8 @@ public class UserMapper {
         User user = new User();
         user.setId(dto.getId());
         user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+        user.setDefaultCurrencyCode(dto.getDefaultCurrencyCode());
         return user;
     }
 }
