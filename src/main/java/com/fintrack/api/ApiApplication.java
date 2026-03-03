@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ApiApplication {
     protected ApiApplication() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public static void main(String[] args) {
