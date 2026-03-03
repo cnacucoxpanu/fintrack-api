@@ -90,5 +90,6 @@ public class UserService {
     }
 
     public void createUserWithAccountsNonTransactional() {
+        throw new UnsupportedOperationException("This method is not implemented yet.");
     }
 }
