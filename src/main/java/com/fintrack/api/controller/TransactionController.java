@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -69,6 +70,20 @@ public class TransactionController {
     public TransactionDto getById(@PathVariable Long id) {
         Transaction entity = service.getById(id);
         return mapper.toDto(entity);
+    }
+
+    /**
+     * Updates an existing transaction.
+     *
+     * @param id  the transaction ID
+     * @param dto the transaction data transfer object with updated fields
+     * @return the updated transaction as a DTO
+     */
+    @PutMapping("/{id}")
+    public TransactionDto update(@PathVariable Long id, @Valid @RequestBody TransactionDto dto) {
+        Transaction toUpdate = mapper.toEntity(dto);
+        Transaction updated = service.update(id, toUpdate);
+        return mapper.toDto(updated);
     }
 
     /**

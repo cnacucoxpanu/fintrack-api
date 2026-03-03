@@ -5,9 +5,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Data Transfer Object for Category.
- */
 @Getter
 @Setter
 public class CategoryDto {
@@ -20,4 +17,10 @@ public class CategoryDto {
 
     @NotBlank(message = "Type is required")
     private String type;
+
+    private String description;
+
+    private String icon;
+
+    private Double monthlyLimit;
 }

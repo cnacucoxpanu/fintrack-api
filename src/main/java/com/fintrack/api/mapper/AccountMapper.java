@@ -12,6 +12,11 @@ public class AccountMapper {
         dto.setId(account.getId());
         dto.setName(account.getName());
         dto.setBalance(account.getBalance());
+        dto.setCurrencyCode(account.getCurrencyCode());
+        dto.setType(account.getType());
+        dto.setIcon(account.getIcon());
+        dto.setCreditLimit(account.getCreditLimit());
+        dto.setArchived(account.getIsArchived());
 
         if (account.getUser() != null) {
             dto.setUserId(account.getUser().getId());
@@ -25,6 +30,11 @@ public class AccountMapper {
         account.setId(dto.getId());
         account.setName(dto.getName());
         account.setBalance(dto.getBalance());
+        account.setCurrencyCode(dto.getCurrencyCode());
+        account.setType(dto.getType());
+        account.setIcon(dto.getIcon());
+        account.setCreditLimit(dto.getCreditLimit());
+        account.setIsArchived(Boolean.TRUE.equals(dto.getArchived()));
         return account;
     }
 }

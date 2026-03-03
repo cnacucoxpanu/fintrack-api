@@ -5,15 +5,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import java.time.OffsetDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Entity representing a financial category.
- */
 @Entity
-@Table(name = "categories")
 @Getter
 @Setter
 public class Category {
@@ -27,4 +23,14 @@ public class Category {
 
     @Column(nullable = false)
     private String type;
+
+    @Column(length = 255)
+    private String description;
+
+    private String icon;
+
+    private Double monthlyLimit;
+
+    @Column(nullable = false)
+    private OffsetDateTime createdAt;
 }

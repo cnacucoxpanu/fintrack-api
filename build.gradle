@@ -25,7 +25,8 @@ configurations.matching { it.name == 'checkstyle' }.all {
 }
 
 dependencies {
-
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'org.postgresql:postgresql'
     // WEB
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
@@ -44,19 +45,6 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-
-checkstyle {
-    ignoreFailures = false
-    maxWarnings = 0
-}
-
-tasks.withType(Checkstyle).configureEach {
-    configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
-    reports {
-        xml.required = true
-        html.required = true
-    }
 }
 
 tasks.named('test') {
