@@ -88,10 +88,6 @@ public class UserService {
         account1.setUser(savedUser);
         accountRepository.save(account1);
 
-        // Simulate a failure between two related operations.
-        if (true) {
-            throw new RuntimeException("Simulated failure without @Transactional");
-        }
 
         Account account2 = new Account();
         account2.setName("Demo account 2");
@@ -123,8 +119,5 @@ public class UserService {
         account2.setBalance(200.0);
         account2.setUser(savedUser);
         accountRepository.save(account2);
-
-        // Simulate a failure that should roll the whole operation back.
-        throw new RuntimeException("Simulated failure with @Transactional");
     }
 }
