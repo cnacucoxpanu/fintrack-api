@@ -88,4 +88,7 @@ public class UserService {
         account2.setUser(savedUser);
         accountRepository.save(account2);
     }
+
+    public void createUserWithAccountsNonTransactional() {
+    }
 }
