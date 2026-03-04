@@ -1,41 +1,51 @@
 package com.fintrack.api.service;
 
+import com.fintrack.api.dto.AccountDto;
+import com.fintrack.api.dto.UserDto;
 import com.fintrack.api.entity.Account;
+import com.fintrack.api.entity.User;
+import com.fintrack.api.exception.EntityNotFoundException;
+import com.fintrack.api.mapper.AccountMapper;
+import com.fintrack.api.mapper.UserMapper;
 import com.fintrack.api.repository.AccountRepository;
-import java.util.List;
+import com.fintrack.api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class AccountService {
 
-    private final AccountRepository repository;
+    private final AccountRepository accountRepository;
+    private final UserRepository userRepository;
+    private final AccountMapper accountMapper;
+    private final UserMapper userMapper;
 
-    public Account create(Account account) {
-        return repository.save(account);
+    @Transactional(readOnly = true)
+    public List<AccountDto> getAllAccounts() {
+        return accountRepository.findAll().stream()
+                .map(accountMapper::toDto)
+                .toList();
     }
 
-    public List<Account> getAll() {
-        return repository.findAll();
+    @Transactional(readOnly = true)
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(userMapper::toDto)
+                .toList();
     }
 
-    public Account getById(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found: " + id));
-    }
+    @Transactional
+    public AccountDto saveAccount(AccountDto dto) {
+        User user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + dto.getUserId()));
 
-    public Account update(Long id, Account account) {
-        Account existing = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found: " + id));
+        Account account = accountMapper.toEntity(dto, user);
+        Account savedAccount = accountRepository.save(account);
 
-        existing.setName(account.getName());
-        existing.setBalance(account.getBalance());
-
-        return repository.save(existing);
-    }
-
-    public void delete(Long id) {
-        repository.deleteById(id);
+        return accountMapper.toDto(savedAccount);
     }
 }

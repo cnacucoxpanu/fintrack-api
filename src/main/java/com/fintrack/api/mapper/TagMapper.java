@@ -8,16 +8,16 @@ import org.springframework.stereotype.Component;
 public class TagMapper {
 
     public TagDto toDto(Tag tag) {
-        TagDto dto = new TagDto();
-        dto.setId(tag.getId());
-        dto.setName(tag.getName());
-        return dto;
+        return TagDto.builder()
+                .id(tag.getId())
+                .name(tag.getName())
+                .build();
     }
 
     public Tag toEntity(TagDto dto) {
-        Tag tag = new Tag();
-        tag.setId(dto.getId());
-        tag.setName(dto.getName());
-        return tag;
+        return Tag.builder()
+                .id(dto.getId())
+                .name(dto.getName())
+                .build();
     }
 }

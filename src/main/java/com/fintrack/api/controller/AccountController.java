@@ -1,47 +1,36 @@
 package com.fintrack.api.controller;
 
-import com.fintrack.api.entity.Account;
+import com.fintrack.api.dto.AccountDto;
+import com.fintrack.api.dto.UserDto;
 import com.fintrack.api.service.AccountService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("api/accounts")
+@RequestMapping("/api/accounts")
 @RequiredArgsConstructor
 public class AccountController {
 
     private final AccountService service;
 
-    @PostMapping
-    public Account createUser(@RequestBody Account account) {
-        return service.create(account);
-    }
-
     @GetMapping
-    public List<Account> getAll() {
-        return service.getAll();
+    public List<AccountDto> getAllAccounts() {
+        return service.getAllAccounts();
     }
 
-    @GetMapping("/{id}")
-    public Account getById(@PathVariable Long id) {
-        return service.getById(id);
+    @GetMapping("/users")
+    public List<UserDto> getAllUsers() {
+        return service.getAllUsers();
     }
 
-    @PutMapping("/{id}")
-    public Account update(@PathVariable Long id, @RequestBody Account account) {
-        return service.update(id, account);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id) {
-        service.delete(id);
+    @PostMapping
+    public AccountDto createAccount(@RequestBody AccountDto dto) {
+        return service.saveAccount(dto);
     }
 }

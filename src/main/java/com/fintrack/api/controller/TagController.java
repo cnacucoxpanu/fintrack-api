@@ -1,6 +1,6 @@
 package com.fintrack.api.controller;
 
-import com.fintrack.api.entity.Tag;
+import com.fintrack.api.dto.TagDto;
 import com.fintrack.api.service.TagService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -14,34 +14,34 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/tags")
+@RequestMapping("/api/tags")
 @RequiredArgsConstructor
 public class TagController {
 
     private final TagService service;
 
-    @PostMapping
-    public Tag createUser(@RequestBody Tag tag) {
-        return service.create(tag);
-    }
-
     @GetMapping
-    public List<Tag> getAll() {
-        return service.getAll();
+    public List<TagDto> getAllTags() {
+        return service.findAll();
     }
 
     @GetMapping("/{id}")
-    public Tag getById(@PathVariable Long id) {
-        return service.getById(id);
+    public TagDto getTagById(@PathVariable Long id) {
+        return service.findById(id);
+    }
+
+    @PostMapping
+    public TagDto createTag(@RequestBody TagDto dto) {
+        return service.create(dto);
     }
 
     @PutMapping("/{id}")
-    public Tag update(@PathVariable Long id, @RequestBody Tag tag) {
-        return service.update(id, tag);
+    public TagDto updateTag(@PathVariable Long id, @RequestBody TagDto dto) {
+        return service.update(id, dto);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id) {
+    public void deleteTag(@PathVariable Long id) {
         service.delete(id);
     }
 }
