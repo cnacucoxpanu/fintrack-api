@@ -1,36 +1,34 @@
 package com.fintrack.api.entity;
 
-import jakarta.persistence.Column;
+import java.util.List;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.time.OffsetDateTime;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@Table(name = "categories")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(nullable = false)
-    private String type;
-
-    @Column(length = 255)
-    private String description;
-
-    private String icon;
-
-    private Double monthlyLimit;
-
-    @Column(nullable = false)
-    private OffsetDateTime createdAt;
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    private List<Transaction> transactions;
 }

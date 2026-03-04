@@ -2,26 +2,36 @@ package com.fintrack.api.mapper;
 
 import com.fintrack.api.dto.UserDto;
 import com.fintrack.api.entity.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class UserMapper {
 
+    private final AccountMapper accountMapper;
+
     public UserDto toDto(User user) {
-        UserDto dto = new UserDto();
-        dto.setId(user.getId());
-        dto.setName(user.getName());
-        dto.setEmail(user.getEmail());
-        dto.setDefaultCurrencyCode(user.getDefaultCurrencyCode());
-        return dto;
+        if (user == null) {
+            return null;
+        }
+        return UserDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .accounts(user.getAccounts() != null
+                        ? user.getAccounts().stream().map(accountMapper::toDto).toList() : null)
+                .build();
     }
 
     public User toEntity(UserDto dto) {
-        User user = new User();
-        user.setId(dto.getId());
-        user.setName(dto.getName());
-        user.setEmail(dto.getEmail());
-        user.setDefaultCurrencyCode(dto.getDefaultCurrencyCode());
-        return user;
+        if (dto == null) {
+            return null;
+        }
+        return User.builder()
+                .id(dto.getId())
+                .name(dto.getName())
+                .email(dto.getEmail())
+                .build();
     }
 }

@@ -2,7 +2,6 @@ package com.fintrack.api.controller;
 
 import com.fintrack.api.dto.CategoryDto;
 import com.fintrack.api.service.CategoryService;
-import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,27 +22,27 @@ public class CategoryController {
     private final CategoryService service;
 
     @GetMapping
-    public List<CategoryDto> getAll(@RequestParam(required = false) String name) {
-        return service.getAll(name);
+    public List<CategoryDto> getAllCategories(@RequestParam(required = false) String name) {
+        return service.findAll(name);
     }
 
     @GetMapping("/{id}")
-    public CategoryDto getById(@PathVariable Long id) {
-        return service.getById(id);
+    public CategoryDto getCategoryById(@PathVariable Long id) {
+        return service.findById(id);
     }
 
     @PostMapping
-    public CategoryDto create(@Valid @RequestBody CategoryDto dto) {
+    public CategoryDto createCategory(@RequestBody CategoryDto dto) {
         return service.create(dto);
     }
 
     @PutMapping("/{id}")
-    public CategoryDto update(@PathVariable Long id, @Valid @RequestBody CategoryDto dto) {
+    public CategoryDto updateCategory(@PathVariable Long id, @RequestBody CategoryDto dto) {
         return service.update(id, dto);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id) {
+    public void deleteCategory(@PathVariable Long id) {
         service.delete(id);
     }
 }

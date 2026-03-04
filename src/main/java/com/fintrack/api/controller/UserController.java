@@ -1,6 +1,6 @@
 package com.fintrack.api.controller;
 
-import com.fintrack.api.entity.User;
+import com.fintrack.api.dto.UserDto;
 import com.fintrack.api.service.UserService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -14,20 +14,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService service;
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        return service.create(user);
+    public UserDto createUser(@RequestBody UserDto dto) {
+        return service.create(dto);
     }
 
     @GetMapping
-    public List<User> getAll() {
-        return service.getAll();
+    public List<UserDto> getAllUsers() {
+        return service.findAll();
     }
 
     /**
@@ -35,8 +35,8 @@ public class UserController {
      * each user's accounts are loaded in separate queries.
      */
     @GetMapping("/with-accounts/naive")
-    public List<User> getAllWithAccountsNPlusOne() {
-        return service.getAllWithAccountsNPlusOne();
+    public List<UserDto> getAllUsersWithAccountsNPlusOne() {
+        return service.findAllWithAccountsNPlusOne();
     }
 
     /**
@@ -44,22 +44,22 @@ public class UserController {
      * the N+1 select problem.
      */
     @GetMapping("/with-accounts/optimized")
-    public List<User> getAllWithAccountsOptimized() {
-        return service.getAllWithAccountsOptimized();
+    public List<UserDto> getAllUsersWithAccountsOptimized() {
+        return service.findAllWithAccountsOptimized();
     }
 
     @GetMapping("/{id}")
-    public User getById(@PathVariable Long id) {
-        return service.getById(id);
+    public UserDto getUserById(@PathVariable Long id) {
+        return service.findById(id);
     }
 
     @PutMapping("/{id}")
-    public User update(@PathVariable Long id, @RequestBody User user) {
-        return service.update(id, user);
+    public UserDto updateUser(@PathVariable Long id, @RequestBody UserDto dto) {
+        return service.update(id, dto);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id) {
+    public void deleteUser(@PathVariable Long id) {
         service.delete(id);
     }
 

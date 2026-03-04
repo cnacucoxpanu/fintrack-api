@@ -1,6 +1,9 @@
 package com.fintrack.api.service;
 
+import com.fintrack.api.dto.TagDto;
 import com.fintrack.api.entity.Tag;
+import com.fintrack.api.exception.EntityNotFoundException;
+import com.fintrack.api.mapper.TagMapper;
 import com.fintrack.api.repository.TagRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -11,27 +14,24 @@ import org.springframework.stereotype.Service;
 public class TagService {
 
     private final TagRepository repository;
+    private final TagMapper mapper;
 
-    public Tag create(Tag tag) {
-        return repository.save(tag);
+    public List<TagDto> findAll() {
+        return repository.findAll().stream().map(mapper::toDto).toList();
     }
 
-    public List<Tag> getAll() {
-        return repository.findAll();
+    public TagDto findById(Long id) {
+        return mapper.toDto(repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Tag not found")));
     }
 
-    public Tag getById(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found: " + id));
+    public TagDto create(TagDto dto) {
+        return mapper.toDto(repository.save(mapper.toEntity(dto)));
     }
 
-    public Tag update(Long id, Tag tag) {
-        Tag existing = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found: " + id));
-
-        existing.setName(tag.getName());
-
-        return repository.save(existing);
+    public TagDto update(Long id, TagDto dto) {
+        Tag tag = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Tag not found"));
+        tag.setName(dto.getName());
+        return mapper.toDto(repository.save(tag));
     }
 
     public void delete(Long id) {

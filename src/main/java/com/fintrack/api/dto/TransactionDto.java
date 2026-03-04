@@ -1,23 +1,25 @@
 package com.fintrack.api.dto;
 
-import java.time.LocalDate;
-import java.util.List;
+import com.fintrack.api.entity.TransactionDirection;
+import java.math.BigDecimal;
+import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class TransactionDto {
+
     private Long id;
-    private Double amount;
-    private String description;
-    private LocalDate transactionDate;
-    private LocalDate bookingDate;
-    private String direction;
-    private String merchantName;
-    private String location;
-    private Boolean planned;
+    private BigDecimal amount;
+    private TransactionDirection direction;
     private Long accountId;
     private Long categoryId;
-    private List<Long> tagIds;
+    private Set<Long> tagIds;
 }
