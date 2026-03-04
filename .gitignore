@@ -53,3 +53,4 @@ out/
 .DS_Store
 Thumbs.db
 HELP.md
+src/main/resources/application.properties
