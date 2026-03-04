@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder // Позволяет использовать Account.builder()
+@Builder
 public class Account {
 
     @Id

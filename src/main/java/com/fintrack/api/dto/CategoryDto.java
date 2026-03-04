@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class CategoryDto {
-
     private Long id;
     private String name;
+    private String type;
 }
