@@ -4,11 +4,7 @@ import com.fintrack.api.dto.AccountDto;
 import com.fintrack.api.dto.UserDto;
 import com.fintrack.api.service.AccountService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,6 +23,11 @@ public class AccountController {
     @GetMapping("/users")
     public List<UserDto> getAllUsers() {
         return service.getAllUsers();
+    }
+
+    @GetMapping("/{id}")
+    public AccountDto getAccountById(@PathVariable Long id) {
+        return service.getAccountById(id);
     }
 
     @PostMapping

@@ -32,6 +32,13 @@ public class AccountService {
     }
 
     @Transactional(readOnly = true)
+    public AccountDto getAccountById(Long id) {
+        return accountRepository.findById(id)
+                .map(accountMapper::toDto)
+                .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + id));
+    }
+
+    @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(userMapper::toDto)
