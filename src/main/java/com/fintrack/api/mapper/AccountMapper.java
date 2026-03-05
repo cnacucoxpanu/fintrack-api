@@ -12,6 +12,7 @@ public class AccountMapper {
         if (account == null) {
             return null;
         }
+
         return AccountDto.builder()
                 .id(account.getId())
                 .name(account.getName())
@@ -24,6 +25,7 @@ public class AccountMapper {
         if (dto == null) {
             return null;
         }
+
         return Account.builder()
                 .id(dto.getId())
                 .name(dto.getName())

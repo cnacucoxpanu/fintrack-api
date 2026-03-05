@@ -53,20 +53,16 @@ public class TransactionService {
         transactionRepository.deleteById(id);
     }
 
-    // 🔥 Метод без транзакции
     public void saveWithoutTransactional(TransactionDto dto) {
         processTransaction(dto);
     }
 
-    // 🔥 Метод с транзакцией
     @Transactional
     public void saveWithTransactional(TransactionDto dto) {
         processTransaction(dto);
     }
 
-    // 🔥 Общая логика
     private void processTransaction(TransactionDto dto) {
-
         Account account = accountRepository.findById(dto.getAccountId())
                 .orElseThrow(() -> new EntityNotFoundException("Account not found"));
 
