@@ -2,6 +2,9 @@ package com.fintrack.api.controller;
 
 import com.fintrack.api.dto.UserDto;
 import com.fintrack.api.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,52 +22,38 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Tag(name = "Users", description = "Управление пользователями")
 public class UserController {
 
     private final UserService service;
 
+    @Operation(summary = "Создать пользователя")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto createUser(@RequestBody UserDto dto) {
+    public UserDto createUser(@Valid @RequestBody UserDto dto) {
         return service.create(dto);
     }
 
+    @Operation(summary = "Получить всех пользователей")
     @GetMapping
     public List<UserDto> getAllUsers() {
         return service.findAll();
     }
 
-    @GetMapping("/{id}")
-    public UserDto getUserById(@PathVariable Long id) {
-        return service.findById(id);
-    }
-
+    @Operation(summary = "Обновить данные пользователя")
     @PutMapping("/{id}")
-    public UserDto updateUser(@PathVariable Long id, @RequestBody UserDto dto) {
+    public UserDto updateUser(@PathVariable Long id, @Valid @RequestBody UserDto dto) {
         return service.update(id, dto);
     }
 
+    @Operation(summary = "Удалить пользователя")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable Long id) {
         service.delete(id);
     }
 
-    @GetMapping("/with-accounts/naive")
-    public List<UserDto> getAllUsersWithAccountsNPlusOne() {
-        return service.findAllWithAccountsNPlusOne();
-    }
-
-    @GetMapping("/with-accounts/optimized")
-    public List<UserDto> getAllUsersWithAccountsOptimized() {
-        return service.findAllWithAccountsOptimized();
-    }
-
-    @PostMapping("/demo/non-transactional")
-    public void createUserWithAccountsNonTransactional() {
-        service.createUserWithAccountsNonTransactional();
-    }
-
+    @Operation(summary = "Демонстрация отката транзакции (Rollback)")
     @PostMapping("/demo/transactional")
     public void createUserWithAccountsTransactional() {
         service.createUserWithAccountsTransactional();

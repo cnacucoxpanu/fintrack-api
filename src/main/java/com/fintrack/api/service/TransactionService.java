@@ -1,5 +1,6 @@
 package com.fintrack.api.service;
 
+import com.fintrack.api.dto.SearchKey;
 import com.fintrack.api.dto.TransactionDto;
 import com.fintrack.api.entity.Account;
 import com.fintrack.api.entity.Category;
@@ -13,13 +14,17 @@ import com.fintrack.api.repository.CategoryRepository;
 import com.fintrack.api.repository.TagRepository;
 import com.fintrack.api.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable; // Используем ТОЛЬКО этот импорт
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -31,26 +36,37 @@ public class TransactionService {
     private final TagRepository tagRepository;
     private final TransactionMapper mapper;
 
+    private final Map<SearchKey, Page<TransactionDto>> cache = new ConcurrentHashMap<>();
+
+    public Page<TransactionDto> searchByUserName(String userName, Pageable pageable) {
+        SearchKey key = new SearchKey(userName, pageable.getPageNumber(), pageable.getPageSize());
+
+        return cache.computeIfAbsent(key, k -> transactionRepository
+                .findByUserName(userName, pageable)
+                .map(mapper::toDto));
+    }
+
     public List<TransactionDto> findAll(TransactionDirection direction) {
         if (direction != null) {
-            return transactionRepository.findByDirection(direction)
-                    .stream()
+            return transactionRepository.findByDirection(direction).stream()
                     .map(mapper::toDto)
                     .toList();
         }
-        return transactionRepository.findAllWithDetails()
-                .stream()
+        return transactionRepository.findAllWithDetails().stream()
                 .map(mapper::toDto)
                 .toList();
     }
 
     public TransactionDto findById(Long id) {
-        return mapper.toDto(transactionRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Transaction not found")));
+        return transactionRepository.findById(id)
+                .map(mapper::toDto)
+                .orElseThrow(() -> new EntityNotFoundException("Transaction not found"));
     }
 
+    @Transactional
     public void delete(Long id) {
         transactionRepository.deleteById(id);
+        invalidateCache();
     }
 
     public void saveWithoutTransactional(TransactionDto dto) {
@@ -73,9 +89,13 @@ public class TransactionService {
 
         Transaction transaction = mapper.toEntity(dto, account, category, tags);
         transaction.setCreatedAt(OffsetDateTime.now());
-
         transactionRepository.save(transaction);
 
+        updateAccountBalance(account, dto);
+        invalidateCache();
+    }
+
+    private void updateAccountBalance(Account account, TransactionDto dto) {
         BigDecimal newBalance = dto.getDirection() == TransactionDirection.EXPENSE
                 ? account.getBalance().subtract(dto.getAmount())
                 : account.getBalance().add(dto.getAmount());
@@ -86,5 +106,9 @@ public class TransactionService {
 
         account.setBalance(newBalance);
         accountRepository.save(account);
+    }
+
+    private void invalidateCache() {
+        cache.clear();
     }
 }
