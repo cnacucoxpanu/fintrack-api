@@ -28,7 +28,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             + " WHERE u.name = :userName",
             countQuery = "SELECT count(*) FROM transactions t "
                     + " JOIN accounts a ON t.account_id = a.id "
-                    + " JOIN users u ON a.user_id = u.id " // Добавил JOIN u для countQuery
+                    + " JOIN users u ON a.user_id = u.id "
                     + " WHERE u.name = :userName",
             nativeQuery = true)
     Page<Transaction> findByUsernameNative(@Param("userName") String userName, Pageable pageable);
