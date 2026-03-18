@@ -1,7 +1,6 @@
 package com.fintrack.api.dto;
 
 import com.fintrack.api.entity.TransactionDirection;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -18,7 +17,6 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Schema(description = "Схема данных транзакции")
 public class TransactionDto {
 
     private Long id;

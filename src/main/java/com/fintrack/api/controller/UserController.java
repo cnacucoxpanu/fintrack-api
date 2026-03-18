@@ -2,8 +2,6 @@ package com.fintrack.api.controller;
 
 import com.fintrack.api.dto.UserDto;
 import com.fintrack.api.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,38 +20,32 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-@Tag(name = "Users", description = "Управление пользователями")
 public class UserController {
 
     private final UserService service;
 
-    @Operation(summary = "Создать пользователя")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto createUser(@Valid @RequestBody UserDto dto) {
         return service.create(dto);
     }
 
-    @Operation(summary = "Получить всех пользователей")
     @GetMapping
     public List<UserDto> getAllUsers() {
         return service.findAll();
     }
 
-    @Operation(summary = "Обновить данные пользователя")
     @PutMapping("/{id}")
     public UserDto updateUser(@PathVariable Long id, @Valid @RequestBody UserDto dto) {
         return service.update(id, dto);
     }
 
-    @Operation(summary = "Удалить пользователя")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable Long id) {
         service.delete(id);
     }
 
-    @Operation(summary = "Демонстрация отката транзакции (Rollback)")
     @PostMapping("/demo/transactional")
     public void createUserWithAccountsTransactional() {
         service.createUserWithAccountsTransactional();

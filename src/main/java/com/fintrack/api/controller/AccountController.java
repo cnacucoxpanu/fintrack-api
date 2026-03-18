@@ -2,6 +2,7 @@ package com.fintrack.api.controller;
 
 import com.fintrack.api.dto.AccountDto;
 import com.fintrack.api.service.AccountService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,12 +36,12 @@ public class AccountController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public AccountDto createAccount(@RequestBody AccountDto dto) {
+    public AccountDto createAccount(@Valid @RequestBody AccountDto dto) {
         return service.saveAccount(dto);
     }
 
     @PutMapping("/{id}")
-    public AccountDto updateAccount(@PathVariable Long id, @RequestBody AccountDto dto) {
+    public AccountDto updateAccount(@PathVariable Long id, @Valid @RequestBody AccountDto dto) {
         return service.updateAccount(id, dto);
     }
 

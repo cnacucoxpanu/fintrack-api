@@ -32,4 +32,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
                     + " WHERE u.name = :userName",
             nativeQuery = true)
     Page<Transaction> findByUsernameNative(@Param("userName") String userName, Pageable pageable);
+
+    @Query(value = "SELECT t.* FROM transactions t WHERE t.account_id = :accountId ORDER BY t.created_at DESC LIMIT :limit",
+            nativeQuery = true)
+    List<Transaction> findRecentTransactionsByAccountId(@Param("accountId") Long accountId, @Param("limit") Integer limit);
 }

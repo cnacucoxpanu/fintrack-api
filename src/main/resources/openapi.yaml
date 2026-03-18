@@ -1,0 +1,682 @@
+openapi: 3.0.3
+info:
+  title: FinTrack API
+  description: |
+    API для управления финансами пользователей.
+
+    **Основные возможности:**
+    - Управление пользователями
+    - Управление банковскими счетами
+    - Управление транзакциями (доходы/расходы)
+    - Категории и теги для транзакций
+    - Поиск и фильтрация данных
+    - Пагинация результатов
+
+    **Аутентификация:** В разработке
+  version: 1.0.0
+  contact:
+    name: FinTrack Team
+    email: support@fintrack.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+
+tags:
+  - name: Users
+    description: Управление пользователями
+  - name: Accounts
+    description: Управление банковскими счетами
+  - name: Categories
+    description: Управление категориями транзакций
+  - name: Tags
+    description: Управление тегами транзакций
+  - name: Transactions
+    description: Управление транзакциями
+
+paths:
+  /api/users:
+    post:
+      tags:
+        - Users
+      summary: Создать пользователя
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDto'
+      responses:
+        '201':
+          description: Пользователь успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+    get:
+      tags:
+        - Users
+      summary: Получить всех пользователей
+      operationId: getAllUsers
+      responses:
+        '200':
+          description: Список пользователей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDto'
+
+  /api/users/{id}:
+    put:
+      tags:
+        - Users
+      summary: Обновить данные пользователя
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDto'
+      responses:
+        '200':
+          description: Пользователь успешно обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+    delete:
+      tags:
+        - Users
+      summary: Удалить пользователя
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Пользователь успешно удален
+
+  /api/users/demo/transactional:
+    post:
+      tags:
+        - Users
+      summary: Демонстрация отката транзакции (Rollback)
+      operationId: createUserWithAccountsTransactional
+      responses:
+        '200':
+          description: Операция выполнена
+
+  /api/accounts:
+    get:
+      tags:
+        - Accounts
+      summary: Получить все счета
+      operationId: getAllAccounts
+      responses:
+        '200':
+          description: Список счетов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccountDto'
+    post:
+      tags:
+        - Accounts
+      summary: Создать новый счет
+      operationId: createAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountDto'
+      responses:
+        '201':
+          description: Счет успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+
+  /api/accounts/{id}:
+    get:
+      tags:
+        - Accounts
+      summary: Получить счет по ID
+      operationId: getAccountById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Данные счета
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+    put:
+      tags:
+        - Accounts
+      summary: Обновить данные счета
+      operationId: updateAccount
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountDto'
+      responses:
+        '200':
+          description: Счет успешно обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountDto'
+    delete:
+      tags:
+        - Accounts
+      summary: Удалить счет
+      operationId: deleteAccount
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Счет успешно удален
+
+  /api/categories:
+    get:
+      tags:
+        - Categories
+      summary: Получить все категории с фильтрацией по названию
+      operationId: getAllCategories
+      parameters:
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Список категорий
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoryDto'
+    post:
+      tags:
+        - Categories
+      summary: Создать новую категорию
+      operationId: createCategory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryDto'
+      responses:
+        '201':
+          description: Категория успешно создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDto'
+
+  /api/categories/{id}:
+    get:
+      tags:
+        - Categories
+      summary: Получить категорию по ID
+      operationId: getCategoryById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Данные категории
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDto'
+    put:
+      tags:
+        - Categories
+      summary: Обновить данные категории
+      operationId: updateCategory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryDto'
+      responses:
+        '200':
+          description: Категория успешно обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDto'
+    delete:
+      tags:
+        - Categories
+      summary: Удалить категорию
+      operationId: deleteCategory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Категория успешно удалена
+
+  /api/tags:
+    get:
+      tags:
+        - Tags
+      summary: Получить все теги
+      operationId: getAllTags
+      responses:
+        '200':
+          description: Список тегов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TagDto'
+    post:
+      tags:
+        - Tags
+      summary: Создать новый тег
+      operationId: createTag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagDto'
+      responses:
+        '201':
+          description: Тег успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagDto'
+
+  /api/tags/{id}:
+    get:
+      tags:
+        - Tags
+      summary: Получить тег по ID
+      operationId: getTagById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Данные тега
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagDto'
+    put:
+      tags:
+        - Tags
+      summary: Обновить данные тега
+      operationId: updateTag
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagDto'
+      responses:
+        '200':
+          description: Тег успешно обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagDto'
+    delete:
+      tags:
+        - Tags
+      summary: Удалить тег
+      operationId: deleteTag
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Тег успешно удален
+
+  /api/transactions:
+    get:
+      tags:
+        - Transactions
+      summary: Получить все транзакции с фильтрацией
+      operationId: getAllTransactions
+      parameters:
+        - name: direction
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - INCOME
+              - EXPENSE
+      responses:
+        '200':
+          description: Список транзакций
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionDto'
+    post:
+      tags:
+        - Transactions
+      summary: Создать транзакцию (с управлением транзакциями)
+      operationId: createTransaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionDto'
+      responses:
+        '200':
+          description: Транзакция успешно создана
+
+  /api/transactions/search:
+    get:
+      tags:
+        - Transactions
+      summary: Поиск по пользователю с кэшированием и пагинацией
+      operationId: searchTransactionsByUserName
+      parameters:
+        - name: userName
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Страница результатов поиска
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageTransactionDto'
+
+  /api/transactions/{id}:
+    delete:
+      tags:
+        - Transactions
+      summary: Удалить транзакцию
+      operationId: deleteTransaction
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Транзакция успешно удалена
+
+components:
+  schemas:
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          minLength: 2
+          maxLength: 50
+        email:
+          type: string
+          format: email
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountDto'
+      required:
+        - name
+        - email
+
+    AccountDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        balance:
+          type: number
+          format: decimal
+          minimum: 0
+        userId:
+          type: integer
+          format: int64
+      required:
+        - name
+        - balance
+        - userId
+
+    CategoryDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          maxLength: 50
+        type:
+          type: string
+          maxLength: 20
+      required:
+        - name
+
+    TagDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          maxLength: 30
+      required:
+        - name
+
+    TransactionDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        amount:
+          type: number
+          format: decimal
+          minimum: 0.01
+        direction:
+          type: string
+          enum:
+            - INCOME
+            - EXPENSE
+        accountId:
+          type: integer
+          format: int64
+        categoryId:
+          type: integer
+          format: int64
+        tagIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+      required:
+        - amount
+        - direction
+        - accountId
+        - categoryId
+
+    PageTransactionDto:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionDto'
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        last:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/Sort'
+        numberOfElements:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        empty:
+          type: boolean
+
+    Pageable:
+      type: object
+      properties:
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/Sort'
+
+    Sort:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        unsorted:
+          type: boolean
+        sorted:
+          type: boolean
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string

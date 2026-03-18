@@ -15,7 +15,7 @@ import com.fintrack.api.repository.TagRepository;
 import com.fintrack.api.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable; // Используем ТОЛЬКО этот импорт
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -110,5 +110,11 @@ public class TransactionService {
 
     private void invalidateCache() {
         cache.clear();
+    }
+
+    public List<TransactionDto> findRecentTransactionsByAccountId(Long accountId, Integer limit) {
+        return transactionRepository.findRecentTransactionsByAccountId(accountId, limit).stream()
+                .map(mapper::toDto)
+                .toList();
     }
 }
