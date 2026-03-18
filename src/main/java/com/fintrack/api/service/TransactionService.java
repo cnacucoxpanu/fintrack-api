@@ -24,7 +24,6 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -35,8 +34,7 @@ public class TransactionService {
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
     private final TransactionMapper mapper;
-
-    private final Map<SearchKey, Page<TransactionDto>> cache = new ConcurrentHashMap<>();
+    private final Map<SearchKey, Page<TransactionDto>> cache;
 
     public Page<TransactionDto> searchByUserName(String userName, Pageable pageable) {
         SearchKey key = new SearchKey(userName, pageable.getPageNumber(), pageable.getPageSize());

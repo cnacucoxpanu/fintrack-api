@@ -26,10 +26,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             + " JOIN accounts a ON t.account_id = a.id "
             + " JOIN users u ON a.user_id = u.id "
             + " WHERE u.name = :userName",
-            countQuery = "SELECT count(*) FROM transactions t "
-                    + " JOIN accounts a ON t.account_id = a.id "
-                    + " JOIN users u ON a.user_id = u.id "
-                    + " WHERE u.name = :userName",
             nativeQuery = true)
     Page<Transaction> findByUsernameNative(@Param("userName") String userName, Pageable pageable);
 
@@ -47,9 +43,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             + "JOIN categories c ON t.category_id = c.id "
             + "WHERE c.name ILIKE %:categoryName% "
             + "ORDER BY t.created_at DESC",
-            countQuery = "SELECT count(*) FROM transactions t "
-                    + "JOIN categories c ON t.category_id = c.id "
-                    + "WHERE c.name ILIKE %:categoryName%",
             nativeQuery = true)
     Page<Transaction> findByCategoryNameNative(@Param("categoryName") String categoryName, Pageable pageable);
 }
