@@ -33,7 +33,23 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             nativeQuery = true)
     Page<Transaction> findByUsernameNative(@Param("userName") String userName, Pageable pageable);
 
-    @Query(value = "SELECT t.* FROM transactions t WHERE t.account_id = :accountId ORDER BY t.created_at DESC LIMIT :limit",
+    @Query(value = "SELECT t.* FROM transactions t WHERE t.account_id = :accountId "
+            + "ORDER BY t.created_at DESC LIMIT :limit",
             nativeQuery = true)
-    List<Transaction> findRecentTransactionsByAccountId(@Param("accountId") Long accountId, @Param("limit") Integer limit);
+    List<Transaction> findRecentTransactionsByAccountId(@Param("accountId") Long accountId,
+                                                        @Param("limit") Integer limit);
+
+    @Query("SELECT t FROM Transaction t JOIN t.category c "
+            + "WHERE c.name LIKE %:categoryName%")
+    Page<Transaction> findByCategoryName(@Param("categoryName") String categoryName, Pageable pageable);
+
+    @Query(value = "SELECT t.* FROM transactions t "
+            + "JOIN categories c ON t.category_id = c.id "
+            + "WHERE c.name ILIKE %:categoryName% "
+            + "ORDER BY t.created_at DESC",
+            countQuery = "SELECT count(*) FROM transactions t "
+                    + "JOIN categories c ON t.category_id = c.id "
+                    + "WHERE c.name ILIKE %:categoryName%",
+            nativeQuery = true)
+    Page<Transaction> findByCategoryNameNative(@Param("categoryName") String categoryName, Pageable pageable);
 }

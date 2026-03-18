@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -28,6 +29,11 @@ public class TransactionController {
     @GetMapping("/search")
     public Page<TransactionDto> search(@RequestParam String userName, Pageable pageable) {
         return service.searchByUserName(userName, pageable);
+    }
+
+    @GetMapping("/search-native")
+    public Page<TransactionDto> searchNative(@RequestParam String userName, Pageable pageable) {
+        return service.searchByUserNameNative(userName, pageable);
     }
 
     @GetMapping
@@ -44,5 +50,15 @@ public class TransactionController {
     @DeleteMapping("/{id}")
     public void deleteTransaction(@PathVariable Long id) {
         service.delete(id);
+    }
+
+    @GetMapping("/cache/stats")
+    public Map<String, Integer> getCacheStats() {
+        return service.getCacheStats();
+    }
+
+    @PostMapping("/cache/clear")
+    public void clearCache() {
+        service.clearCache();
     }
 }

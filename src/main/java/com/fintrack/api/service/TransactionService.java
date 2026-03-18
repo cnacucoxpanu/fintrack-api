@@ -117,4 +117,35 @@ public class TransactionService {
                 .map(mapper::toDto)
                 .toList();
     }
+
+    public Page<TransactionDto> searchByUserNameNative(String userName, Pageable pageable) {
+        SearchKey key = new SearchKey(userName, pageable.getPageNumber(), pageable.getPageSize());
+
+        return cache.computeIfAbsent(key, k -> transactionRepository
+                .findByUsernameNative(userName, pageable)
+                .map(mapper::toDto));
+    }
+
+    public Map<String, Integer> getCacheStats() {
+        return Map.of(
+                "cacheSize", cache.size(),
+                "entries", cache.keySet().stream()
+                        .mapToInt(k -> 1)
+                        .sum()
+        );
+    }
+
+    public void clearCache() {
+        invalidateCache();
+    }
+
+    public Page<TransactionDto> findByCategoryName(String categoryName, Pageable pageable) {
+        return transactionRepository.findByCategoryName(categoryName, pageable)
+                .map(mapper::toDto);
+    }
+
+    public Page<TransactionDto> findByCategoryNameNative(String categoryName, Pageable pageable) {
+        return transactionRepository.findByCategoryNameNative(categoryName, pageable)
+                .map(mapper::toDto);
+    }
 }
