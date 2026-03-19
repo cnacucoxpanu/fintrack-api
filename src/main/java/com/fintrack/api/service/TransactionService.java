@@ -69,7 +69,7 @@ public class TransactionService {
 
     public void saveWithoutTransactional(TransactionDto dto) {
         processTransaction(dto);
-    }
+    }   
 
     @Transactional
     public void saveWithTransactional(TransactionDto dto) {
