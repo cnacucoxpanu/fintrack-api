@@ -19,7 +19,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @EntityGraph(attributePaths = {"account", "category", "tags"})
     List<Transaction> findAllWithDetails();
 
-    @Query("SELECT t FROM Transaction t JOIN t.account a JOIN a.user u WHERE u.name = :userName")
+    @Query("SELECT DISTINCT t FROM Transaction t JOIN FETCH t.account a JOIN FETCH a.user u JOIN FETCH t.category WHERE u.name = :userName")
     Page<Transaction> findByUserName(@Param("userName") String userName, Pageable pageable);
 
     @Query(value = "SELECT t.* FROM transactions t "

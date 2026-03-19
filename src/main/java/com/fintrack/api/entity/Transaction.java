@@ -22,6 +22,7 @@
     import lombok.Getter;
     import lombok.NoArgsConstructor;
     import lombok.Setter;
+    import org.hibernate.annotations.BatchSize;
     import org.hibernate.annotations.JdbcTypeCode;
     import org.hibernate.type.SqlTypes;
 
@@ -55,6 +56,7 @@
         @JoinColumn(name = "category_id")
         private Category category;
 
+        @BatchSize(size = 50)
         @ManyToMany(fetch = FetchType.LAZY)
         @JoinTable(
                 name = "transaction_tags",
