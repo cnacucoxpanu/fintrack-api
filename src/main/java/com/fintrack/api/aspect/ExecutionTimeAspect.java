@@ -5,18 +5,10 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
-
-/**
- * Аспект для логирования времени выполнения методов сервисного слоя.
- */
 @Aspect
 @Component
 @Slf4j
 public class ExecutionTimeAspect {
-
-    /**
-     * Логирует время выполнения всех методов в пакете service.
-     */
     @Around("execution(* com.fintrack.api.service.*.*(..))")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();

@@ -668,12 +668,12 @@ components:
     ErrorResponse:
       type: object
       properties:
-        timestamp:
-          type: string
-          format: date-time
         status:
           type: integer
           format: int32
+        timestamp:
+          type: string
+          format: date-time
         error:
           type: string
         message:
