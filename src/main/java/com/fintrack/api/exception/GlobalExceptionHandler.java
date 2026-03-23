@@ -8,7 +8,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -48,7 +47,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneral(Exception ex) {
-        log.error("Неожиданная ошибка: {}", ex.getMessage(), ex);
+        log.warn("Неожиданная ошибка: {}", ex.getMessage(), ex);
         return buildResponse(
                 "Внутренняя ошибка сервера",
                 "INTERNAL_ERROR",
