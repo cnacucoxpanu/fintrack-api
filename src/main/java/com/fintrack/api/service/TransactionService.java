@@ -69,28 +69,11 @@ public class TransactionService {
 
     public void saveWithoutTransactional(TransactionDto dto) {
         processTransaction(dto);
-    }   
+    }
 
     @Transactional
     public void saveWithTransactional(TransactionDto dto) {
         processTransaction(dto);
-    }
-
-    private void processTransaction(TransactionDto dto) {
-        Account account = accountRepository.findById(dto.getAccountId())
-                .orElseThrow(() -> new EntityNotFoundException("Account not found"));
-
-        Category category = categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
-
-        Set<Tag> tags = Set.copyOf(tagRepository.findAllById(dto.getTagIds()));
-
-        Transaction transaction = mapper.toEntity(dto, account, category, tags);
-        transaction.setCreatedAt(OffsetDateTime.now());
-        transactionRepository.save(transaction);
-
-        updateAccountBalance(account, dto);
-        invalidateCache();
     }
 
     private void updateAccountBalance(Account account, TransactionDto dto) {
@@ -145,5 +128,63 @@ public class TransactionService {
     public Page<TransactionDto> findByCategoryNameNative(String categoryName, Pageable pageable) {
         return transactionRepository.findByCategoryNameNative(categoryName, pageable)
                 .map(mapper::toDto);
+    }
+
+    @Transactional
+    public List<TransactionDto> saveBulk(List<TransactionDto> dtos) {
+        return processBulkTransactions(dtos);
+    }
+    public List<TransactionDto> saveBulkWithoutTransactional(List<TransactionDto> dtos) {
+        return processBulkTransactions(dtos);
+    }
+
+    private List<TransactionDto> processBulkTransactions(List<TransactionDto> dtos) {
+        if (dtos == null || dtos.isEmpty()) {
+            return List.of();
+        }
+
+        return dtos.stream()
+                .map(this::processTransactionAndReturnDto)
+                .toList();
+    }
+
+    private void processTransaction(TransactionDto dto) {
+        Account account = accountRepository.findById(dto.getAccountId())
+                .orElseThrow(() -> new EntityNotFoundException("Account not found"));
+
+        Category category = categoryRepository.findById(dto.getCategoryId())
+                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+
+        Set<Tag> tags = dto.getTagIds() != null
+                ? Set.copyOf(tagRepository.findAllById(dto.getTagIds()))
+                : Set.of();
+
+        Transaction transaction = mapper.toEntity(dto, account, category, tags);
+        transaction.setCreatedAt(OffsetDateTime.now());
+        transactionRepository.save(transaction);
+
+        updateAccountBalance(account, dto);
+        invalidateCache();
+    }
+
+    private TransactionDto processTransactionAndReturnDto(TransactionDto dto) {
+        Account account = accountRepository.findById(dto.getAccountId())
+                .orElseThrow(() -> new EntityNotFoundException("Account not found"));
+
+        Category category = categoryRepository.findById(dto.getCategoryId())
+                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+
+        Set<Tag> tags = dto.getTagIds() != null
+                ? Set.copyOf(tagRepository.findAllById(dto.getTagIds()))
+                : Set.of();
+
+        Transaction transaction = mapper.toEntity(dto, account, category, tags);
+        transaction.setCreatedAt(OffsetDateTime.now());
+        transactionRepository.save(transaction);
+
+        updateAccountBalance(account, dto);
+        invalidateCache();
+
+        return mapper.toDto(transaction);
     }
 }

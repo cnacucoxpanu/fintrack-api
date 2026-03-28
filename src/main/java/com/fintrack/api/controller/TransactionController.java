@@ -61,4 +61,14 @@ public class TransactionController {
     public void clearCache() {
         service.clearCache();
     }
+
+    @PostMapping("/bulk")
+    public List<TransactionDto> createTransactionsBulk(@Valid @RequestBody List<TransactionDto> dtos) {
+        return service.saveBulk(dtos);
+    }
+
+    @PostMapping("/bulk-no-tx")
+    public List<TransactionDto> createTransactionsBulkNoTransactional(@Valid @RequestBody List<TransactionDto> dtos) {
+        return service.saveBulkWithoutTransactional(dtos);
+    }
 }
