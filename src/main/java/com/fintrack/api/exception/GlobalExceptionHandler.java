@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -43,6 +44,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
         log.warn("Незаконный аргумент: {}", ex.getMessage());
         return buildResponse(ex.getMessage(), "ILLEGAL_ARGUMENT", HttpStatus.BAD_REQUEST, null);
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ErrorResponse> handleHandlerMethodValidation(HandlerMethodValidationException ex) {
+        List<String> details = java.util.Arrays.stream(ex.getDetailMessageArguments())
+                .map(Object::toString)
+                .toList();
+        log.warn("Ошибка валидации метода: {}", ex.getMessage());
+        return buildResponse("Ошибка валидации запроса", "VALIDATION_ERROR", HttpStatus.BAD_REQUEST, details);
     }
 
     @ExceptionHandler(Exception.class)

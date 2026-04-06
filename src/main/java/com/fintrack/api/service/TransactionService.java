@@ -143,9 +143,12 @@ public class TransactionService {
             return List.of();
         }
 
-        return dtos.stream()
+        List<TransactionDto> result = dtos.stream()
                 .map(this::processTransactionAndReturnDto)
                 .toList();
+
+        invalidateCache();
+        return result;
     }
 
     private void processTransaction(TransactionDto dto) {
@@ -180,11 +183,10 @@ public class TransactionService {
 
         Transaction transaction = mapper.toEntity(dto, account, category, tags);
         transaction.setCreatedAt(OffsetDateTime.now());
-        transactionRepository.save(transaction);
+        Transaction savedTransaction = transactionRepository.save(transaction);
 
         updateAccountBalance(account, dto);
-        invalidateCache();
 
-        return mapper.toDto(transaction);
+        return mapper.toDto(savedTransaction);
     }
 }
