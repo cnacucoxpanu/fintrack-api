@@ -134,6 +134,7 @@ public class TransactionService {
     public List<TransactionDto> saveBulk(List<TransactionDto> dtos) {
         return processBulkTransactions(dtos);
     }
+
     public List<TransactionDto> saveBulkWithoutTransactional(List<TransactionDto> dtos) {
         return processBulkTransactions(dtos);
     }

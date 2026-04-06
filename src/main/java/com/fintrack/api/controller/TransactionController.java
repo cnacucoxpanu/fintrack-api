@@ -68,7 +68,8 @@ public class TransactionController {
     }
 
     @PostMapping("/bulk-no-tx")
-    public List<TransactionDto> createTransactionsBulkNoTransactional(@Valid @RequestBody List<@Valid TransactionDto> dtos) {
+    public List<TransactionDto> createTransactionsBulkNoTransactional(@Valid @RequestBody List<@Valid
+            TransactionDto> dtos) {
         return service.saveBulkWithoutTransactional(dtos);
     }
 }
