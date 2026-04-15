@@ -3,6 +3,7 @@ package com.fintrack.api.service;
 import com.fintrack.api.dto.TaskStatusDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +15,15 @@ import java.util.concurrent.atomic.AtomicLong;
 @Service
 public class AsyncTaskService {
 
-    private static final Logger log = LoggerFactory.getLogger(AsyncTaskService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AsyncTaskService.class);
 
     private final Map<String, TaskInfo> taskRegistry = new ConcurrentHashMap<>();
     private final AtomicLong taskCounter = new AtomicLong(0);
+    private final ApplicationContext applicationContext;
+
+    public AsyncTaskService(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 
     record TaskInfo(
             String taskId,
@@ -33,35 +39,33 @@ public class AsyncTaskService {
         long startTime = System.currentTimeMillis();
 
         taskRegistry.put(taskId, new TaskInfo(taskId, "RUNNING", null, startTime, null));
-        log.info("Task {} started: generate report for {} months", taskId, months);
+        LOG.info("Task {} started: generate report for {} months", taskId, months);
 
-        return generateReportAsync(taskId, months, startTime);
+        return applicationContext.getBean(AsyncTaskService.class)
+                .generateReportAsync(taskId, months, startTime);
     }
 
     @Async
-    private CompletableFuture<String> generateReportAsync(String taskId, int months, long startTime) {
+    CompletableFuture<String> generateReportAsync(String taskId, int months, long startTime) {
         try {
-            // Имитация длительной операции (100 мс для ускорения тестов)
             Thread.sleep(100L * months);
 
             String result = "Report generated for " + months + " months. Total transactions: " + (months * 150);
             taskRegistry.put(taskId, new TaskInfo(taskId, "COMPLETED", result, startTime, System.currentTimeMillis()));
-            log.info("Task {} completed in {} ms", taskId, System.currentTimeMillis() - startTime);
+            LOG.info("Task {} completed in {} ms", taskId, System.currentTimeMillis() - startTime);
             return CompletableFuture.completedFuture(taskId);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             taskRegistry.put(taskId, new TaskInfo(taskId, "INTERRUPTED", null, startTime, System.currentTimeMillis()));
             return CompletableFuture.failedFuture(e);
         } catch (Exception e) {
-            taskRegistry.put(taskId, new TaskInfo(taskId, "FAILED", e.getMessage(), startTime, System.currentTimeMillis()));
-            log.error("Task {} failed", taskId, e);
+            taskRegistry.put(taskId, new TaskInfo(taskId, "FAILED", e.getMessage(), startTime,
+                    System.currentTimeMillis()));
+            LOG.error("Task {} failed", taskId, e);
             return CompletableFuture.failedFuture(e);
         }
     }
 
-    /**
-     * Проверяет статус задачи по ID.
-     */
     public TaskStatusDto getTaskStatus(String taskId) {
         TaskInfo info = taskRegistry.get(taskId);
         if (info == null) {
@@ -79,9 +83,6 @@ public class AsyncTaskService {
         );
     }
 
-    /**
-     * Возвращает потокобезопасный счётчик запущенных задач (демонстрация Atomic).
-     */
     public long getTotalTasksStarted() {
         return taskCounter.get();
     }
