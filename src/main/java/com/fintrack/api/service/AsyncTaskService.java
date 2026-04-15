@@ -28,10 +28,6 @@ public class AsyncTaskService {
     ) {
     }
 
-    /**
-     * Запускает асинхронную бизнес-операцию (имитация длительного отчёта).
-     * Возвращает ID задачи для последующей проверки статуса.
-     */
     public CompletableFuture<String> startReportGeneration(int months) {
         String taskId = "task-" + taskCounter.incrementAndGet();
         long startTime = System.currentTimeMillis();
@@ -45,8 +41,8 @@ public class AsyncTaskService {
     @Async
     private CompletableFuture<String> generateReportAsync(String taskId, int months, long startTime) {
         try {
-            // Имитация длительной операции
-            Thread.sleep(2000L * months);
+            // Имитация длительной операции (100 мс для ускорения тестов)
+            Thread.sleep(100L * months);
 
             String result = "Report generated for " + months + " months. Total transactions: " + (months * 150);
             taskRegistry.put(taskId, new TaskInfo(taskId, "COMPLETED", result, startTime, System.currentTimeMillis()));
