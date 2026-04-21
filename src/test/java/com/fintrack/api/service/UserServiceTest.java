@@ -51,44 +51,10 @@ class UserServiceTest {
 
     @Test
     void findAll_shouldReturnAllUsers() {
-        when(repository.findAll()).thenReturn(List.of(user));
-        when(mapper.toDto(user)).thenReturn(dto);
-
-        List<UserDto> result = service.findAll();
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(repository).findAll();
-    }
-
-    @Test
-    void findAll_emptyList_shouldReturnEmptyList() {
-        when(repository.findAll()).thenReturn(List.of());
-
-        List<UserDto> result = service.findAll();
-
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void findAllWithAccountsNPlusOne_shouldReturnAllUsers() {
-        when(repository.findAll()).thenReturn(List.of(user));
-        when(mapper.toDto(user)).thenReturn(dto);
-
-        List<UserDto> result = service.findAllWithAccountsNPlusOne();
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(repository).findAll();
-    }
-
-    @Test
-    void findAllWithAccountsOptimized_shouldReturnAllUsers() {
         when(repository.findAllWithAccounts()).thenReturn(List.of(user));
         when(mapper.toDto(user)).thenReturn(dto);
 
-        List<UserDto> result = service.findAllWithAccountsOptimized();
+        List<UserDto> result = service.findAll();
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -96,13 +62,37 @@ class UserServiceTest {
     }
 
     @Test
-    void findAllWithAccountsOptimized_emptyList_shouldReturnEmptyList() {
+    void findAll_emptyList_shouldReturnEmptyList() {
         when(repository.findAllWithAccounts()).thenReturn(List.of());
 
-        List<UserDto> result = service.findAllWithAccountsOptimized();
+        List<UserDto> result = service.findAll();
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void findAll_multipleUsers_shouldReturnAll() {
+        User user2 = User.builder()
+                .id(2L)
+                .name("Second User")
+                .email("second@example.com")
+                .build();
+
+        UserDto dto2 = UserDto.builder()
+                .id(2L)
+                .name("Second User")
+                .email("second@example.com")
+                .build();
+
+        when(repository.findAllWithAccounts()).thenReturn(List.of(user, user2));
+        when(mapper.toDto(user)).thenReturn(dto);
+        when(mapper.toDto(user2)).thenReturn(dto2);
+
+        List<UserDto> result = service.findAll();
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
     }
 
     @Test
@@ -192,93 +182,5 @@ class UserServiceTest {
         when(repository.existsById(999L)).thenReturn(false);
 
         assertThrows(EntityNotFoundException.class, () -> service.delete(999L));
-    }
-
-    @Test
-    void createUserWithAccountsTransactional_shouldSaveAndThrow() {
-        when(repository.save(any(User.class))).thenAnswer(i -> i.getArguments()[0]);
-
-        assertThrows(EntityNotFoundException.class, () -> service.createUserWithAccountsTransactional());
-        verify(repository).save(any(User.class));
-    }
-
-    @Test
-    void createUserWithAccountsNonTransactional_shouldSaveAndThrow() {
-        when(repository.save(any(User.class))).thenAnswer(i -> i.getArguments()[0]);
-
-        assertThrows(EntityNotFoundException.class, () -> service.createUserWithAccountsNonTransactional());
-        verify(repository).save(any(User.class));
-    }
-
-    @Test
-    void findAll_multipleUsers_shouldReturnAll() {
-        User user2 = User.builder()
-                .id(2L)
-                .name("Second User")
-                .email("second@example.com")
-                .build();
-
-        UserDto dto2 = UserDto.builder()
-                .id(2L)
-                .name("Second User")
-                .email("second@example.com")
-                .build();
-
-        when(repository.findAll()).thenReturn(List.of(user, user2));
-        when(mapper.toDto(user)).thenReturn(dto);
-        when(mapper.toDto(user2)).thenReturn(dto2);
-
-        List<UserDto> result = service.findAll();
-
-        assertNotNull(result);
-        assertEquals(2, result.size());
-    }
-
-    @Test
-    void findAllWithAccountsNPlusOne_multipleUsers_shouldReturnAll() {
-        User user2 = User.builder()
-                .id(2L)
-                .name("Second User")
-                .email("second@example.com")
-                .build();
-
-        UserDto dto2 = UserDto.builder()
-                .id(2L)
-                .name("Second User")
-                .email("second@example.com")
-                .build();
-
-        when(repository.findAll()).thenReturn(List.of(user, user2));
-        when(mapper.toDto(user)).thenReturn(dto);
-        when(mapper.toDto(user2)).thenReturn(dto2);
-
-        List<UserDto> result = service.findAllWithAccountsNPlusOne();
-
-        assertNotNull(result);
-        assertEquals(2, result.size());
-    }
-
-    @Test
-    void findAllWithAccountsOptimized_multipleUsers_shouldReturnAll() {
-        User user2 = User.builder()
-                .id(2L)
-                .name("Second User")
-                .email("second@example.com")
-                .build();
-
-        UserDto dto2 = UserDto.builder()
-                .id(2L)
-                .name("Second User")
-                .email("second@example.com")
-                .build();
-
-        when(repository.findAllWithAccounts()).thenReturn(List.of(user, user2));
-        when(mapper.toDto(user)).thenReturn(dto);
-        when(mapper.toDto(user2)).thenReturn(dto2);
-
-        List<UserDto> result = service.findAllWithAccountsOptimized();
-
-        assertNotNull(result);
-        assertEquals(2, result.size());
     }
 }

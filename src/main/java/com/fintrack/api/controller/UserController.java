@@ -45,9 +45,4 @@ public class UserController {
     public void deleteUser(@PathVariable Long id) {
         service.delete(id);
     }
-
-    @PostMapping("/demo/transactional")
-    public void createUserWithAccountsTransactional() {
-        service.createUserWithAccountsTransactional();
-    }
 }
