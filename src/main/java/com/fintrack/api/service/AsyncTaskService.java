@@ -16,6 +16,8 @@ import java.util.concurrent.atomic.AtomicLong;
 public class AsyncTaskService {
 
     private static final Logger LOG = LoggerFactory.getLogger(AsyncTaskService.class);
+    private static final long SLEEP_TIME_PER_MONTH_MS = 100L;
+    private static final int TRANSACTIONS_PER_MONTH = 150;
 
     private final Map<String, TaskInfo> taskRegistry = new ConcurrentHashMap<>();
     private final AtomicLong taskCounter = new AtomicLong(0);
@@ -34,23 +36,25 @@ public class AsyncTaskService {
     ) {
     }
 
-    public CompletableFuture<String> startReportGeneration(int months) {
+    public String startReportGeneration(int months) {
         String taskId = "task-" + taskCounter.incrementAndGet();
         long startTime = System.currentTimeMillis();
 
         taskRegistry.put(taskId, new TaskInfo(taskId, "RUNNING", null, startTime, null));
         LOG.info("Task {} started: generate report for {} months", taskId, months);
 
-        return applicationContext.getBean(AsyncTaskService.class)
+        applicationContext.getBean(AsyncTaskService.class)
                 .generateReportAsync(taskId, months, startTime);
+
+        return taskId;
     }
 
     @Async
     CompletableFuture<String> generateReportAsync(String taskId, int months, long startTime) {
         try {
-            Thread.sleep(100L * months);
+            Thread.sleep(SLEEP_TIME_PER_MONTH_MS * months);
 
-            String result = "Report generated for " + months + " months. Total transactions: " + (months * 150);
+            String result = "Report generated for " + months + " months. Total transactions: " + (months * TRANSACTIONS_PER_MONTH);
             taskRegistry.put(taskId, new TaskInfo(taskId, "COMPLETED", result, startTime, System.currentTimeMillis()));
             LOG.info("Task {} completed in {} ms", taskId, System.currentTimeMillis() - startTime);
             return CompletableFuture.completedFuture(taskId);

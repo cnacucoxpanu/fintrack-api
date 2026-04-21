@@ -153,41 +153,43 @@ public class TransactionService {
     }
 
     private void processTransaction(TransactionDto dto) {
-        Account account = accountRepository.findById(dto.getAccountId())
-                .orElseThrow(() -> new EntityNotFoundException("Account not found"));
+        Account account = findAccountById(dto.getAccountId());
+        Category category = findCategoryById(dto.getCategoryId());
+        Set<Tag> tags = findTagsByIds(dto.getTagIds());
 
-        Category category = categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
-
-        Set<Tag> tags = dto.getTagIds() != null
-                ? Set.copyOf(tagRepository.findAllById(dto.getTagIds()))
-                : Set.of();
-
-        Transaction transaction = mapper.toEntity(dto, account, category, tags);
-        transaction.setCreatedAt(OffsetDateTime.now());
-        transactionRepository.save(transaction);
-
+        createAndSaveTransaction(dto, account, category, tags);
         updateAccountBalance(account, dto);
         invalidateCache();
     }
 
     private TransactionDto processTransactionAndReturnDto(TransactionDto dto) {
-        Account account = accountRepository.findById(dto.getAccountId())
-                .orElseThrow(() -> new EntityNotFoundException("Account not found"));
+        Account account = findAccountById(dto.getAccountId());
+        Category category = findCategoryById(dto.getCategoryId());
+        Set<Tag> tags = findTagsByIds(dto.getTagIds());
 
-        Category category = categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
-
-        Set<Tag> tags = dto.getTagIds() != null
-                ? Set.copyOf(tagRepository.findAllById(dto.getTagIds()))
-                : Set.of();
-
-        Transaction transaction = mapper.toEntity(dto, account, category, tags);
-        transaction.setCreatedAt(OffsetDateTime.now());
-        Transaction savedTransaction = transactionRepository.save(transaction);
-
+        Transaction transaction = createAndSaveTransaction(dto, account, category, tags);
         updateAccountBalance(account, dto);
 
-        return mapper.toDto(savedTransaction);
+        return mapper.toDto(transaction);
+    }
+
+    private Account findAccountById(Long accountId) {
+        return accountRepository.findById(accountId)
+                .orElseThrow(() -> new EntityNotFoundException("Account not found"));
+    }
+
+    private Category findCategoryById(Long categoryId) {
+        return categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+    }
+
+    private Set<Tag> findTagsByIds(Set<Long> tagIds) {
+        return tagIds != null ? Set.copyOf(tagRepository.findAllById(tagIds)) : Set.of();
+    }
+
+    private Transaction createAndSaveTransaction(TransactionDto dto, Account account, Category category, Set<Tag> tags) {
+        Transaction transaction = mapper.toEntity(dto, account, category, tags);
+        transaction.setCreatedAt(OffsetDateTime.now());
+        return transactionRepository.save(transaction);
     }
 }

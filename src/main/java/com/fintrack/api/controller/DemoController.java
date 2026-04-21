@@ -29,8 +29,8 @@ public class DemoController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt,desc") String sort) {
-        
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort.split(",")));
+
+        Pageable pageable = createPageable(page, size, sort);
         return transactionService.searchByUserName(userName, pageable);
     }
 
@@ -40,8 +40,8 @@ public class DemoController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt,desc") String sort) {
-        
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort.split(",")));
+
+        Pageable pageable = createPageable(page, size, sort);
         return transactionService.searchByUserNameNative(userName, pageable);
     }
 
@@ -51,8 +51,8 @@ public class DemoController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt,desc") String sort) {
-        
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort.split(",")));
+
+        Pageable pageable = createPageable(page, size, sort);
         return transactionService.findByCategoryName(categoryName, pageable);
     }
 
@@ -62,8 +62,8 @@ public class DemoController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt,desc") String sort) {
-        
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort.split(",")));
+
+        Pageable pageable = createPageable(page, size, sort);
         return transactionService.findByCategoryNameNative(categoryName, pageable);
     }
 
@@ -71,7 +71,7 @@ public class DemoController {
     public List<TransactionDto> getRecentTransactions(
             @PathVariable Long accountId,
             @RequestParam(defaultValue = "5") int limit) {
-        
+
         return transactionService.findRecentTransactionsByAccountId(accountId, limit);
     }
 
@@ -84,5 +84,9 @@ public class DemoController {
     public String clearCache() {
         transactionService.clearCache();
         return "Cache cleared successfully";
+    }
+
+    private Pageable createPageable(int page, int size, String sort) {
+        return PageRequest.of(page, size, Sort.by(sort.split(",")));
     }
 }

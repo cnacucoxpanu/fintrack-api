@@ -35,6 +35,8 @@
     @Builder
     public class Transaction {
 
+        private static final int BATCH_SIZE = 50;
+
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
@@ -56,7 +58,7 @@
         @JoinColumn(name = "category_id")
         private Category category;
 
-        @BatchSize(size = 50)
+        @BatchSize(size = BATCH_SIZE)
         @ManyToMany(fetch = FetchType.LAZY)
         @JoinTable(
                 name = "transaction_tags",

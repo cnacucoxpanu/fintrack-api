@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class ExecutionTimeAspect {
+
+    private static final long SLOW_METHOD_THRESHOLD_MS = 1000L;
+
     @Around("execution(* com.fintrack.api.service.*.*(..))")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
@@ -21,7 +24,7 @@ public class ExecutionTimeAspect {
 
             log.info("[PERFORMANCE] Метод {} выполнен за {} мс", methodName, executionTime);
 
-            if (executionTime > 1000) {
+            if (executionTime > SLOW_METHOD_THRESHOLD_MS) {
                 log.warn("[SLOW_METHOD] Метод {} выполнялся дольше 1 секунды ({} мс)",
                         methodName, executionTime);
             }

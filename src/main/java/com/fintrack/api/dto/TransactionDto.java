@@ -21,17 +21,17 @@ public class TransactionDto {
 
     private Long id;
 
-    @NotNull(message = "Сумма обязательна")
-    @Positive(message = "Сумма транзакции должна быть больше нуля")
+    @NotNull(message = "Amount is required")
+    @Positive(message = "Transaction amount must be greater than zero")
     private BigDecimal amount;
 
-    @NotNull(message = "Направление (INCOME/EXPENSE) обязательно")
+    @NotNull(message = "Direction (INCOME/EXPENSE) is required")
     private TransactionDirection direction;
 
-    @NotNull(message = "ID счета обязателен")
+    @NotNull(message = "Account ID is required")
     private Long accountId;
 
-    @NotNull(message = "ID категории обязателен")
+    @NotNull(message = "Category ID is required")
     private Long categoryId;
 
     private Set<Long> tagIds;

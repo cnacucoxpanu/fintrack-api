@@ -20,13 +20,13 @@ public class AccountDto {
 
     private Long id;
 
-    @NotBlank(message = "Название счета обязательно")
+    @NotBlank(message = "Account name is required")
     private String name;
 
-    @NotNull(message = "Баланс должен быть указан")
-    @PositiveOrZero(message = "Баланс не может быть отрицательным")
+    @NotNull(message = "Balance must be specified")
+    @PositiveOrZero(message = "Balance cannot be negative")
     private BigDecimal balance;
 
-    @NotNull(message = "ID пользователя обязателен")
+    @NotNull(message = "User ID is required")
     private Long userId;
 }

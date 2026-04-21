@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/async")
@@ -29,9 +28,7 @@ public class AsyncTaskController {
     @PostMapping("/report")
     @Operation(summary = "Запустить генерацию отчёта асинхронно")
     public ResponseEntity<Map<String, String>> startReport(@RequestParam(defaultValue = "3") int months) {
-        CompletableFuture<String> future = asyncTaskService.startReportGeneration(months);
-        // Возвращаем taskId немедленно, не дожидаясь завершения
-        String taskId = future.join();
+        String taskId = asyncTaskService.startReportGeneration(months);
         return ResponseEntity.accepted().body(Map.of(
                 "taskId", taskId,
                 "message", "Task started. Check status at /api/async/status/{taskId}"

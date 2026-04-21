@@ -20,6 +20,11 @@ target/
 *.rar
 *.log
 
+### --- JMeter --- ###
+jmeter/report/
+test-results/*.jtl
+*.jmx.bak
+
 ### --- IntelliJ IDEA --- ###
 .idea/
 *.iws
