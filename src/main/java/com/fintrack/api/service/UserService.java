@@ -18,16 +18,8 @@ public class UserService {
     private final UserRepository repository;
     private final UserMapper mapper;
 
-    public List<UserDto> findAll() {
-        return repository.findAll().stream().map(mapper::toDto).toList();
-    }
-
-    public List<UserDto> findAllWithAccountsNPlusOne() {
-        return repository.findAll().stream().map(mapper::toDto).toList();
-    }
-
     @Transactional(readOnly = true)
-    public List<UserDto> findAllWithAccountsOptimized() {
+    public List<UserDto> findAll() {
         return repository.findAllWithAccounts().stream().map(mapper::toDto).toList();
     }
 
@@ -58,16 +50,4 @@ public class UserService {
         repository.deleteById(id);
     }
 
-    @Transactional
-    public void createUserWithAccountsTransactional() {
-        User user = User.builder().name("Tx_User").email("tx@test.com").build();
-        repository.save(user);
-        throw new EntityNotFoundException("Rollback triggered");
-    }
-
-    public void createUserWithAccountsNonTransactional() {
-        User user = User.builder().name("NonTx_User").email("notx@test.com").build();
-        repository.save(user);
-        throw new EntityNotFoundException("No rollback here");
-    }
 }

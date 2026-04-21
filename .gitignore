@@ -21,7 +21,7 @@ target/
 *.log
 
 ### --- JMeter --- ###
-jmeter/report/
+jmeter/
 test-results/*.jtl
 *.jmx.bak
 
