@@ -43,6 +43,7 @@ public class UserService {
         return mapper.toDto(user);
     }
 
+    @Transactional
     public void delete(Long id) {
         if (!repository.existsById(id)) {
             throw new EntityNotFoundException("User not found");

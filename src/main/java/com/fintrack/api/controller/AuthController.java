@@ -34,8 +34,7 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
-        String token = jwtTokenProvider.generateToken(userDetails);
+        String token = generateTokenForUser(request.getUsername());
 
         log.info("Login successful for user: {}", request.getUsername());
         return ResponseEntity.ok(new AuthResponse(token, request.getUsername()));
@@ -58,9 +57,13 @@ public class AuthController {
         userRepository.save(user);
         log.info("User registered successfully: {}", request.getUsername());
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
-        String token = jwtTokenProvider.generateToken(userDetails);
+        String token = generateTokenForUser(request.getUsername());
 
         return ResponseEntity.status(201).body(new AuthResponse(token, request.getUsername()));
+    }
+
+    private String generateTokenForUser(String username) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        return jwtTokenProvider.generateToken(userDetails);
     }
 }

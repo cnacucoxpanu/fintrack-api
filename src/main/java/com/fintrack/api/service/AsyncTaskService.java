@@ -18,6 +18,7 @@ public class AsyncTaskService {
     private static final Logger LOG = LoggerFactory.getLogger(AsyncTaskService.class);
     private static final long SLEEP_TIME_PER_MONTH_MS = 100L;
     private static final int TRANSACTIONS_PER_MONTH = 150;
+    private static final int MAX_MONTHS = 24;
 
     private final Map<String, TaskInfo> taskRegistry = new ConcurrentHashMap<>();
     private final AtomicLong taskCounter = new AtomicLong(0);
@@ -37,14 +38,15 @@ public class AsyncTaskService {
     }
 
     public String startReportGeneration(int months) {
+        int validatedMonths = Math.min(Math.max(months, 1), MAX_MONTHS);
         String taskId = "task-" + taskCounter.incrementAndGet();
         long startTime = System.currentTimeMillis();
 
         taskRegistry.put(taskId, new TaskInfo(taskId, "RUNNING", null, startTime, null));
-        LOG.info("Task {} started: generate report for {} months", taskId, months);
+        LOG.info("Task {} started: generate report for {} months", taskId, validatedMonths);
 
         applicationContext.getBean(AsyncTaskService.class)
-                .generateReportAsync(taskId, months, startTime);
+                .generateReportAsync(taskId, validatedMonths, startTime);
 
         return taskId;
     }
