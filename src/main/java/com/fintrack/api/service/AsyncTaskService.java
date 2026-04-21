@@ -38,7 +38,7 @@ public class AsyncTaskService {
     }
 
     public String startReportGeneration(int months) {
-        int validatedMonths = Math.min(Math.max(months, 1), MAX_MONTHS);
+        int validatedMonths = Math.clamp(months, 1, MAX_MONTHS);
         String taskId = "task-" + taskCounter.incrementAndGet();
         long startTime = System.currentTimeMillis();
 
