@@ -1,6 +1,7 @@
 package com.fintrack.api.entity;
 
 import java.util.List;
+import java.util.Objects;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -26,9 +27,23 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String type;
+
     private String name;
+    private String type;
 
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<Transaction> transactions;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Category category = (Category) o;
+        return Objects.equals(id, category.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

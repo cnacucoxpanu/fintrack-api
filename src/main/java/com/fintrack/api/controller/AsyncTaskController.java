@@ -16,7 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/async")
-@Tag(name = "Async Operations", description = "Асинхронные операции и управление задачами")
+@Tag(name = "Async Operations", description = "Asynchronous operations and task management")
 public class AsyncTaskController {
 
     private final AsyncTaskService asyncTaskService;
@@ -26,7 +26,7 @@ public class AsyncTaskController {
     }
 
     @PostMapping("/report")
-    @Operation(summary = "Запустить генерацию отчёта асинхронно")
+    @Operation(summary = "Start report generation asynchronously")
     public ResponseEntity<Map<String, String>> startReport(@RequestParam(defaultValue = "3") int months) {
         String taskId = asyncTaskService.startReportGeneration(months);
         return ResponseEntity.accepted().body(Map.of(
@@ -36,14 +36,14 @@ public class AsyncTaskController {
     }
 
     @GetMapping("/status/{taskId}")
-    @Operation(summary = "Проверить статус асинхронной задачи")
+    @Operation(summary = "Check asynchronous task status")
     public ResponseEntity<TaskStatusDto> getTaskStatus(@PathVariable String taskId) {
         TaskStatusDto status = asyncTaskService.getTaskStatus(taskId);
         return ResponseEntity.ok(status);
     }
 
     @GetMapping("/counter")
-    @Operation(summary = "Получить общее количество запущенных задач (Atomic счётчик)")
+    @Operation(summary = "Get total number of started tasks (Atomic counter)")
     public ResponseEntity<Map<String, Long>> getTotalTasks() {
         return ResponseEntity.ok(Map.of("totalTasksStarted", asyncTaskService.getTotalTasksStarted()));
     }

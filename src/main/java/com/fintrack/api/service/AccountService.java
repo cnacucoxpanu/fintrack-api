@@ -56,10 +56,18 @@ public class AccountService {
         return accountMapper.toDto(accountRepository.save(existingAccount));
     }
 
+    @Transactional
     public void deleteAccount(Long id) {
-        if (!accountRepository.existsById(id)) {
-            throw new EntityNotFoundException("Account not found with id: " + id);
+        Account account = accountRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + id));
+
+        if (account.getTransactions() != null && !account.getTransactions().isEmpty()) {
+            throw new com.fintrack.api.exception.AccountInUseException(
+                "Cannot delete account. It has " + account.getTransactions().size() + " transaction(s). " +
+                "Please delete those transactions first."
+            );
         }
+
         accountRepository.deleteById(id);
     }
 }

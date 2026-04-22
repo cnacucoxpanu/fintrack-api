@@ -14,6 +14,7 @@ import java.util.List;
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
     @Query("SELECT t FROM Transaction t WHERE t.direction = :direction ORDER BY t.id DESC")
+    @EntityGraph(attributePaths = {"account", "category", "tags"})
     List<Transaction> findByDirection(@Param("direction") TransactionDirection direction);
 
     @Query("SELECT t FROM Transaction t ORDER BY t.id DESC")
