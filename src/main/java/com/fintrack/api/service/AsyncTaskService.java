@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class AsyncTaskService {
 
     private static final Logger LOG = LoggerFactory.getLogger(AsyncTaskService.class);
-    private static final long SLEEP_TIME_PER_MONTH_MS = 100L;
+    private static final long SLEEP_TIME_PER_MONTH_MS = 1000L;
     private static final int TRANSACTIONS_PER_MONTH = 150;
     private static final int MAX_MONTHS = 24;
 
