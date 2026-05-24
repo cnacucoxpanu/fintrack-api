@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '../store';
 import { Category } from '../types';
-import { Card, Button, Input, FormGroup, Modal, Alert, Loader, EmptyState, Badge } from '../components/UI';
+import { Card, Button, Input, FormGroup, Modal, Alert, Loader, EmptyState, Badge, Pagination } from '../components/UI';
 import { FolderOpen, Plus, Edit2, Trash2, Search } from 'lucide-react';
+
+const ITEMS_PER_PAGE = 10;
 
 export default function Categories() {
   const {
@@ -19,13 +21,22 @@ export default function Categories() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [form, setForm] = useState({ name: '', type: '' });
   const [filterName, setFilterName] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchCategories(filterName || undefined);
+      setCurrentPage(1); // Сбрасываем на первую страницу при поиске
     }, 300);
     return () => clearTimeout(timer);
   }, [filterName, fetchCategories]);
+
+  // Пагинация
+  const totalPages = Math.ceil(categories.length / ITEMS_PER_PAGE);
+  const paginatedCategories = categories.slice(
+      (currentPage - 1) * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,6 +62,10 @@ export default function Categories() {
     if (confirm('Are you sure you want to delete this category?')) {
       try {
         await deleteCategory(id);
+        // Если после удаления страница опустела, переходим на предыдущую
+        if (paginatedCategories.length === 1 && currentPage > 1) {
+          setCurrentPage(currentPage - 1);
+        }
       } catch (err) {
         console.error(err);
       }
@@ -89,71 +104,77 @@ export default function Categories() {
 
         {error && <Alert message={error} onClose={clearError} />}
 
-        {/* ИСПРАВЛЕНО: Обернули Card в div, так как Card не принимает style */}
-        <div style={{ marginBottom: '1.5rem' }}>
-          <Card>
-            <div className="filter-bar">
-              <Search size={18} color="var(--text-secondary)" />
-              <Input
-                  placeholder="Search categories..."
-                  value={filterName}
-                  onChange={(e) => setFilterName(e.target.value)}
-                  style={{ maxWidth: '300px' }}
-              />
-            </div>
-          </Card>
-        </div>
+        <Card>
+          <div
+              className="filter-bar"
+              style={{
+                marginBottom: '1.5rem',
+                borderBottom: '1px solid var(--border)',
+                paddingBottom: '1.5rem'
+              }}
+          >
+            <Search size={18} color="var(--text-secondary)" />
+            <Input
+                placeholder="Search categories..."
+                value={filterName}
+                onChange={(e) => setFilterName(e.target.value)}
+                style={{ maxWidth: '300px' }}
+            />
+          </div>
 
-        {loading && categories.length === 0 ? (
-            <Card>
+          {loading && categories.length === 0 ? (
               <Loader />
-            </Card>
-        ) : categories.length === 0 ? (
-            <Card>
+          ) : categories.length === 0 ? (
               <EmptyState
                   icon={<FolderOpen size={48} color="var(--text-muted)" />}
                   message="No categories found. Create your first category!"
               />
-            </Card>
-        ) : (
-            <Card>
-              <div className="table-container">
-                <table>
-                  <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Actions</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  {categories.map((category) => (
-                      <tr key={category.id}>
-                        <td style={{ fontWeight: '600' }}>{category.name}</td>
-                        <td>
-                          {category.type ? (
-                              <Badge>{category.type}</Badge>
-                          ) : (
-                              <span style={{ color: 'var(--text-muted)' }}>-</span>
-                          )}
-                        </td>
-                        <td>
-                          <div className="actions">
-                            <Button variant="ghost" icon onClick={() => handleEdit(category)}>
-                              <Edit2 size={16} />
-                            </Button>
-                            <Button variant="ghost" icon onClick={() => handleDelete(category.id)}>
-                              <Trash2 size={16} color="var(--danger)" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                  ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
-        )}
+          ) : (
+              <>
+                <div className="table-container">
+                  <table style={{ width: '100%', tableLayout: 'fixed' }}>
+                    <thead>
+                    <tr>
+                      <th style={{ width: '45%' }}>Name</th>
+                      <th style={{ width: '35%' }}>Type</th>
+                      <th style={{ width: '20%' }}>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {paginatedCategories.map((category) => (
+                        <tr key={category.id}>
+                          <td style={{ fontWeight: '600' }}>{category.name}</td>
+                          <td>
+                            {category.type ? (
+                                <Badge>{category.type}</Badge>
+                            ) : (
+                                <span style={{ color: 'var(--text-muted)' }}>-</span>
+                            )}
+                          </td>
+                          <td>
+                            <div className="actions">
+                              <Button variant="ghost" icon onClick={() => handleEdit(category)}>
+                                <Edit2 size={16} />
+                              </Button>
+                              <Button variant="ghost" icon onClick={() => handleDelete(category.id)}>
+                                <Trash2 size={16} color="var(--danger)" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
+              </>
+          )}
+        </Card>
 
         <Modal
             isOpen={isModalOpen}

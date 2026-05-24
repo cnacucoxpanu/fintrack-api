@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '../store';
-import { Card, Button, Input, FormGroup, Select, Modal, Alert, Loader, EmptyState, Badge } from '../components/UI';
-import { ArrowUpRight, ArrowDownRight, Plus, Trash2, Filter } from 'lucide-react';
+import { Card, Button, Input, FormGroup, Select, Modal, Alert, Loader, EmptyState, Badge, Pagination } from '../components/UI';
+import { Plus, Trash2, Filter, ArrowUpRight } from 'lucide-react';
+
+const ITEMS_PER_PAGE = 10;
 
 export default function Transactions() {
   const {
@@ -19,6 +21,7 @@ export default function Transactions() {
     deleteTransaction,
     clearError,
   } = useStore();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form, setForm] = useState({
     amount: '',
@@ -28,13 +31,22 @@ export default function Transactions() {
     tagIds: [] as number[],
   });
   const [filterDirection, setFilterDirection] = useState<'INCOME' | 'EXPENSE' | ''>('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     fetchTransactions(filterDirection || undefined);
     fetchAccounts();
     fetchCategories();
     fetchTags();
+    setCurrentPage(1); // Сбрасываем на первую страницу при фильтрации
   }, [fetchTransactions, fetchAccounts, fetchCategories, fetchTags, filterDirection]);
+
+  // Пагинация
+  const totalPages = Math.ceil(transactions.length / ITEMS_PER_PAGE);
+  const paginatedTransactions = transactions.slice(
+      (currentPage - 1) * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,6 +68,10 @@ export default function Transactions() {
     if (confirm('Are you sure you want to delete this transaction?')) {
       try {
         await deleteTransaction(id);
+        // Если после удаления страница опустела, переходим на предыдущую
+        if (paginatedTransactions.length === 1 && currentPage > 1) {
+          setCurrentPage(currentPage - 1);
+        }
       } catch (err) {
         console.error(err);
       }
@@ -86,14 +102,6 @@ export default function Transactions() {
   const getCategoryName = (id: number) => categories.find((c) => c.id === id)?.name || 'Unknown';
   const getTagName = (id: number) => tags.find((t) => t.id === id)?.name || 'Unknown';
 
-  const totalIncome = transactions
-      .filter((t) => t.direction === 'INCOME')
-      .reduce((sum, t) => sum + Number(t.amount), 0);
-  const totalExpense = transactions
-      .filter((t) => t.direction === 'EXPENSE')
-      .reduce((sum, t) => sum + Number(t.amount), 0);
-  const balance = totalIncome - totalExpense;
-
   return (
       <div>
         <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -109,129 +117,91 @@ export default function Transactions() {
 
         {error && <Alert message={error} onClose={clearError} />}
 
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-icon" style={{ background: 'rgba(16, 185, 129, 0.15)' }}>
-              <ArrowUpRight size={24} color="var(--success)" />
-            </div>
-            <div className="stat-label">Total Income</div>
-            <div className="stat-value" style={{ color: 'var(--success)' }}>
-              ${totalIncome.toFixed(2)}
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-icon" style={{ background: 'rgba(239, 68, 68, 0.15)' }}>
-              <ArrowDownRight size={24} color="var(--danger)" />
-            </div>
-            <div className="stat-label">Total Expense</div>
-            <div className="stat-value" style={{ color: 'var(--danger)' }}>
-              ${totalExpense.toFixed(2)}
-            </div>
-          </div>
-
-          <div className="stat-card">
-            <div
-                className="stat-icon"
-                style={{
-                  background: balance >= 0 ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                }}
+        <Card>
+          <div className="filter-bar" style={{ marginBottom: '1.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>
+            <Filter size={18} color="var(--text-secondary)" />
+            <Select
+                value={filterDirection}
+                onChange={(e) => setFilterDirection(e.target.value as any)}
+                style={{ width: '200px' }}
             >
-              <ArrowUpRight size={24} color={balance >= 0 ? 'var(--success)' : 'var(--danger)'} />
-            </div>
-            <div className="stat-label">Net Balance</div>
-            <div className="stat-value" style={{ color: balance >= 0 ? 'var(--success)' : 'var(--danger)' }}>
-              ${balance.toFixed(2)}
-            </div>
+              <option value="">All Transactions</option>
+              <option value="INCOME">Income Only</option>
+              <option value="EXPENSE">Expense Only</option>
+            </Select>
           </div>
-        </div>
 
-        {/* ИСПРАВЛЕНО: Card обернут в div */}
-        <div style={{ marginBottom: '1.5rem' }}>
-          <Card>
-            <div className="filter-bar">
-              <Filter size={18} color="var(--text-secondary)" />
-              <Select
-                  value={filterDirection}
-                  onChange={(e) => setFilterDirection(e.target.value as any)}
-                  style={{ width: '200px' }}
-              >
-                <option value="">All Transactions</option>
-                <option value="INCOME">Income Only</option>
-                <option value="EXPENSE">Expense Only</option>
-              </Select>
-            </div>
-          </Card>
-        </div>
-
-        {loading && transactions.length === 0 ? (
-            <Card>
+          {loading && transactions.length === 0 ? (
               <Loader />
-            </Card>
-        ) : transactions.length === 0 ? (
-            <Card>
+          ) : transactions.length === 0 ? (
               <EmptyState
                   icon={<ArrowUpRight size={48} color="var(--text-muted)" />}
                   message="No transactions found. Create your first transaction!"
               />
-            </Card>
-        ) : (
-            <Card>
-              <div className="table-container">
-                <table>
-                  <thead>
-                  <tr>
-                    <th>Type</th>
-                    <th>Amount</th>
-                    <th>Account</th>
-                    <th>Category</th>
-                    <th>Tags</th>
-                    <th>Actions</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  {transactions.map((tx) => (
-                      <tr key={tx.id}>
-                        <td>
-                          <Badge variant={tx.direction === 'INCOME' ? 'success' : 'danger'}>
-                            {tx.direction}
-                          </Badge>
-                        </td>
-                        <td>
-                      <span
-                          style={{
-                            fontWeight: '600',
-                            color: tx.direction === 'INCOME' ? 'var(--success)' : 'var(--danger)',
-                          }}
-                      >
-                        {tx.direction === 'INCOME' ? '+' : '-'}${Number(tx.amount).toFixed(2)}
-                      </span>
-                        </td>
-                        <td>{getAccountName(tx.accountId)}</td>
-                        <td>{getCategoryName(tx.categoryId)}</td>
-                        <td>
-                          {tx.tagIds && tx.tagIds.length > 0 ? (
-                              <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
-                                {tx.tagIds.map((tagId) => (
-                                    <Badge key={tagId}>{getTagName(tagId)}</Badge>
-                                ))}
-                              </div>
-                          ) : (
-                              <span style={{ color: 'var(--text-muted)' }}>No tags</span>
-                          )}
-                        </td>
-                        <td>
-                          <Button variant="ghost" icon onClick={() => handleDelete(tx.id!)}>
-                            <Trash2 size={16} color="var(--danger)" />
-                          </Button>
-                        </td>
-                      </tr>
-                  ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
-        )}
+          ) : (
+              <>
+                <div className="table-container">
+                  <table style={{ width: '100%', tableLayout: 'fixed' }}>
+                    <thead>
+                    <tr>
+                      <th style={{ width: '14%' }}>Type</th>
+                      <th style={{ width: '16%' }}>Amount</th>
+                      <th style={{ width: '20%' }}>Account</th>
+                      <th style={{ width: '20%' }}>Category</th>
+                      <th style={{ width: '20%' }}>Tags</th>
+                      <th style={{ width: '10%' }}>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {paginatedTransactions.map((tx) => (
+                        <tr key={tx.id}>
+                          <td>
+                            <Badge variant={tx.direction === 'INCOME' ? 'success' : 'danger'}>
+                              {tx.direction}
+                            </Badge>
+                          </td>
+                          <td>
+                        <span
+                            style={{
+                              fontWeight: '600',
+                              color: tx.direction === 'INCOME' ? 'var(--success)' : 'var(--danger)',
+                            }}
+                        >
+                          {tx.direction === 'INCOME' ? '+' : '-'}${Number(tx.amount).toFixed(2)}
+                        </span>
+                          </td>
+                          <td>{getAccountName(tx.accountId)}</td>
+                          <td>{getCategoryName(tx.categoryId)}</td>
+                          <td>
+                            {tx.tagIds && tx.tagIds.length > 0 ? (
+                                <div style={{ display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
+                                  {tx.tagIds.map((tagId) => (
+                                      <Badge key={tagId}>{getTagName(tagId)}</Badge>
+                                  ))}
+                                </div>
+                            ) : (
+                                <span style={{ color: 'var(--text-muted)' }}>No tags</span>
+                            )}
+                          </td>
+                          <td>
+                            <Button variant="ghost" icon onClick={() => handleDelete(tx.id!)}>
+                              <Trash2 size={16} color="var(--danger)" />
+                            </Button>
+                          </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
+              </>
+          )}
+        </Card>
 
         <Modal isOpen={isModalOpen} onClose={resetForm} title="Create Transaction">
           <form onSubmit={handleSubmit}>

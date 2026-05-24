@@ -1,3 +1,11 @@
+// Добавлен интерфейс для пагинированных ответов
+export interface PaginatedResponse<T> {
+  data: T[];
+  totalPages: number;
+  currentPage: number;
+  totalElements?: number;
+}
+
 export interface User {
   id: number;
   name: string;
