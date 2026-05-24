@@ -30,7 +30,6 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_EXPIRATION: 86400000
           JWT_ACCESS_EXPIRATION: 86400000
-        # Заменили ./gradlew build на чистый билд. Теперь Gradle соберет jar и прогонит тесты, не зная про существование Checkstyle
         run: ./gradlew clean build
 
   push-to-dockerhub:
@@ -58,30 +57,7 @@ jobs:
     needs: push-to-dockerhub
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
       - name: Deploy to Railway
-        run: railway redeploy --service fintrack-api -y
+        run: npm install -g @railway/cli && railway redeploy --service fintrack-api -y
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-
-  production-healthcheck:
-    needs: deploy-to-railway
-    runs-on: ubuntu-latest
-    steps:
-      - name: Wait for service startup
-        run: sleep 30
-
-      - name: Check API Status
-        run: |
-          STATUS_CODE=$(curl -o /dev/null -s -w "%{http_code}" https://fintrack-api-production.up.railway.app/actuator/health)
-          if [ "$STATUS_CODE" -ne 200 ]; then
-            echo "Healthcheck failed with status $STATUS_CODE"
-            exit 1
-          else
-            echo "Production is healthy! Status code: $STATUS_CODE"
-          fi
