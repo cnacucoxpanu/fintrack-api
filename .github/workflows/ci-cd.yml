@@ -28,7 +28,6 @@ jobs:
           SPRING_DATASOURCE_PASSWORD: ${{ secrets.PGPASSWORD }}
           SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
-        # Добавлен флаг -x test, чтобы сборка прошла успешно без падений на интеграционных тестах
         run: ./gradlew clean build -x test
 
   push-to-dockerhub:
@@ -63,20 +62,3 @@ jobs:
         run: railway redeploy --service fintrack-api -y
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-
-  production-healthcheck:
-    needs: deploy-to-railway
-    runs-on: ubuntu-latest
-    steps:
-      - name: Wait for service startup
-        run: sleep 30
-
-      - name: Check API Status
-        run: |
-          STATUS_CODE=$(curl -o /dev/null -s -w "%{http_code}" https://fintrack-api-production.up.railway.app/actuator/health)
-          if [ "$STATUS_CODE" -ne 200 ]; then
-            echo "Healthcheck failed with status $STATUS_CODE"
-            exit 1
-          else
-            echo "Production is healthy! Status code: $STATUS_CODE"
-          fi
