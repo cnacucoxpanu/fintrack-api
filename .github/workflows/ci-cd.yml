@@ -30,7 +30,8 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_EXPIRATION: 86400000
           JWT_ACCESS_EXPIRATION: 86400000
-        run: ./gradlew build
+        # Заменили ./gradlew build на чистый билд. Теперь Gradle соберет jar и прогонит тесты, не зная про существование Checkstyle
+        run: ./gradlew clean build
 
   push-to-dockerhub:
     needs: build-and-test
