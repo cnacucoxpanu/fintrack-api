@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +40,7 @@ class CategoryServiceTest {
                 .id(1L)
                 .name("Food")
                 .type("EXPENSE")
+                .transactions(new ArrayList<>())
                 .build();
 
         dto = CategoryDto.builder()
@@ -145,11 +147,20 @@ class CategoryServiceTest {
 
     @Test
     void delete_shouldDeleteCategory() {
+        when(repository.findById(1L)).thenReturn(Optional.of(category));
         doNothing().when(repository).deleteById(1L);
 
         service.delete(1L);
 
+        verify(repository).findById(1L);
         verify(repository).deleteById(1L);
+    }
+
+    @Test
+    void delete_notFound_shouldThrowException() {
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> service.delete(999L));
     }
 
     @Test
@@ -171,6 +182,7 @@ class CategoryServiceTest {
                 .id(2L)
                 .name("Transport")
                 .type("EXPENSE")
+                .transactions(new ArrayList<>())
                 .build();
 
         CategoryDto dto2 = CategoryDto.builder()
@@ -195,6 +207,7 @@ class CategoryServiceTest {
                 .id(2L)
                 .name("Fast Food")
                 .type("EXPENSE")
+                .transactions(new ArrayList<>())
                 .build();
 
         CategoryDto dto2 = CategoryDto.builder()

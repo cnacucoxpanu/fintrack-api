@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +39,7 @@ class TagServiceTest {
         tag = Tag.builder()
                 .id(1L)
                 .name("Groceries")
+                .transactions(new HashSet<>())
                 .build();
 
         dto = TagDto.builder()
@@ -141,11 +143,20 @@ class TagServiceTest {
 
     @Test
     void delete_shouldDeleteTag() {
+        when(repository.findById(1L)).thenReturn(Optional.of(tag));
         doNothing().when(repository).deleteById(1L);
 
         service.delete(1L);
 
+        verify(repository).findById(1L);
         verify(repository).deleteById(1L);
+    }
+
+    @Test
+    void delete_notFound_shouldThrowException() {
+        when(repository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> service.delete(999L));
     }
 
     @Test
@@ -153,6 +164,7 @@ class TagServiceTest {
         Tag tag2 = Tag.builder()
                 .id(2L)
                 .name("Shopping")
+                .transactions(new HashSet<>())
                 .build();
 
         TagDto dto2 = TagDto.builder()

@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,6 +54,7 @@ class AccountServiceTest {
                 .name("Test Account")
                 .balance(new BigDecimal("1000.00"))
                 .user(user)
+                .transactions(new ArrayList<>())
                 .build();
 
         dto = AccountDto.builder()
@@ -195,18 +197,18 @@ class AccountServiceTest {
 
     @Test
     void deleteAccount_shouldDeleteAccount() {
-        when(accountRepository.existsById(1L)).thenReturn(true);
+        when(accountRepository.findById(1L)).thenReturn(Optional.of(account));
         doNothing().when(accountRepository).deleteById(1L);
 
         service.deleteAccount(1L);
 
-        verify(accountRepository).existsById(1L);
+        verify(accountRepository).findById(1L);
         verify(accountRepository).deleteById(1L);
     }
 
     @Test
     void deleteAccount_notFound_shouldThrowException() {
-        when(accountRepository.existsById(999L)).thenReturn(false);
+        when(accountRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> service.deleteAccount(999L));
     }
@@ -218,6 +220,7 @@ class AccountServiceTest {
                 .name("Savings Account")
                 .balance(new BigDecimal("5000.00"))
                 .user(user)
+                .transactions(new ArrayList<>())
                 .build();
 
         AccountDto dto2 = AccountDto.builder()
