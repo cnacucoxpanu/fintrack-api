@@ -15,13 +15,13 @@ jobs:
       postgres:
         image: postgres:15-alpine
         env:
-          POSTGRES_DB: ${{ secrets.PGDATABASE }}
-          POSTGRES_USER: ${{ secrets.PGUSER }}
-          POSTGRES_PASSWORD: ${{ secrets.PGPASSWORD }}
+          POSTGRES_DB: ${{ secrets.CI_DB_NAME }}
+          POSTGRES_USER: ${{ secrets.CI_DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.CI_DB_PASSWORD }}
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U ${{ secrets.PGUSER }} -d ${{ secrets.PGDATABASE }}"
+          --health-cmd "pg_isready -U ${{ secrets.CI_DB_USERNAME }} -d ${{ secrets.CI_DB_NAME }}"
           --health-interval 5s
           --health-timeout 3s
           --health-retries 5
@@ -41,9 +41,9 @@ jobs:
 
       - name: Run tests
         env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/${{ secrets.PGDATABASE }}
-          SPRING_DATASOURCE_USERNAME: ${{ secrets.PGUSER }}
-          SPRING_DATASOURCE_PASSWORD: ${{ secrets.PGPASSWORD }}
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/${{ secrets.CI_DB_NAME }}
+          SPRING_DATASOURCE_USERNAME: ${{ secrets.CI_DB_USERNAME }}
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.CI_DB_PASSWORD }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_EXPIRATION: 86400000
         run: ./gradlew test
