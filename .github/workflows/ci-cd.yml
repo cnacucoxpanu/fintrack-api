@@ -96,5 +96,5 @@ jobs:
     steps:
       - name: Healthcheck
         run: |
-          sleep 10
+          sleep 15
           curl --fail ${{ secrets.APP_URL }}/actuator/health || exit 1
